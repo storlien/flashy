@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+body {
+    /* --background: #2f3542;
+    --white: #ffffff;
+    --border: #57606f;
+    --primary-background: #ff4757;
+    --primary-foreground: #f8f8f8;
+    --secondary: #ff6b81; */
+
+    /* background-color: var(--background); */
+
+    font-family: 'Poppins';
+}
