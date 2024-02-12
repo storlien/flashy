@@ -22,48 +22,59 @@ const { handleSubmit } = useForm({
 });
 
 const onSubmit = handleSubmit((values) => {
-  console.log("Submitted")
+  console.log("Submitted");
 });
-
 </script>
 
 <template>
-  <h1>Register new user</h1>
-  <form @submit.prevent="onSubmit">
-    <FormField v-slot="{ componentField }" name="email">
-      <FormItem v-auto-animate>
-        <FormControl>
-          <Input type="email" placeholder="Email" v-bind="componentField" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-    <FormField v-slot="{ componentField }" name="username">
-      <FormItem v-auto-animate>
-        <FormControl>
-          <Input type="text" placeholder="Username" v-bind="componentField" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-    <FormField v-slot="{ componentField }" name="password">
-      <FormItem v-auto-animate>
-        <FormControl>
-          <Input
-            type="password"
-            placeholder="Password"
-            v-bind="componentField"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-    <Button type="submit"> Register </Button>
-  </form>
+  <Card>
+    <CardHeader>
+      <CardTitle>Register New User</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <form @submit.prevent="onSubmit">
+        <FormField v-slot="{ componentField }" name="email">
+          <FormItem v-auto-animate>
+            <FormControl>
+              <Input type="email" placeholder="Email" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="username">
+          <FormItem v-auto-animate>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Username"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="password">
+          <FormItem v-auto-animate>
+            <FormControl>
+              <Input
+                type="password"
+                placeholder="Password"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </form>
+    </CardContent>
+    <CardFooter>
+      <Button type="submit" @click="onSubmit">Register</Button>
+    </CardFooter>
+  </Card>
 </template>
 
 <style scoped>
-  Input {
-    margin: 10px;
-  }
+Input {
+  margin: 10px;
+}
 </style>
