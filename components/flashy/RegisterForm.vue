@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { h } from "vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
@@ -27,9 +26,9 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <Card>
+  <Card id="register-form">
     <CardHeader>
-      <CardTitle>Register New User</CardTitle>
+      <CardTitle>Register</CardTitle>
     </CardHeader>
     <CardContent>
       <form @submit.prevent="onSubmit">
@@ -73,8 +72,11 @@ const onSubmit = handleSubmit((values) => {
   </Card>
 </template>
 
-<style scoped>
-Input {
-  margin: 10px;
+<style lang="scss" scoped>
+#register-form {
+  Input {
+    margin-bottom: 10px;
+  }
+
 }
 </style>
