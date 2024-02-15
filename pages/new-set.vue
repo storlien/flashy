@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Button id="avbrytKnapp" type="submit"><NuxtLink to="./profile/profile">Avbryt</NuxtLink></Button>
+        <Button id="avbrytKnapp" type="submit"><NuxtLink to="./profile">Avbryt</NuxtLink></Button>
         <div class="items-top flex gap-x-2">
         <Checkbox id="terms1" />
         <div class="grid gap-1.5 leading-none">
