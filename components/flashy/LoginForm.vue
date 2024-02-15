@@ -6,13 +6,8 @@ import { vAutoAnimate } from "@formkit/auto-animate/vue";
 
 const formSchema = toTypedSchema(
   z.object({
-    username: z.string().min(2).max(50), //add check if username is taken
-    password: z
-      .string()
-      .min(6)
-      .max(25)
-      .regex(/.*[0-9].*/, "Password must contain at least one number"),
-    email: z.string().email("Must be a valid email"),
+    username: z.string(), //check with database
+    password: z.string(), //check with database
   })
 );
 
@@ -26,28 +21,16 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <Card id="register-form">
+  <Card id="login-form">
     <CardHeader>
-      <CardTitle>Register</CardTitle>
+      <CardTitle>Login</CardTitle>
     </CardHeader>
     <CardContent>
       <form @submit.prevent="onSubmit">
-        <!-- <FormField v-slot="{ componentField }" name="email">
-          <FormItem v-auto-animate>
-            <FormControl>
-              <Input type="email" placeholder="Email" v-bind="componentField" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField> -->
         <FormField v-slot="{ componentField }" name="username">
           <FormItem v-auto-animate>
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Username"
-                v-bind="componentField"
-              />
+              <Input type="text" placeholder="Username" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -67,13 +50,13 @@ const onSubmit = handleSubmit((values) => {
       </form>
     </CardContent>
     <CardFooter>
-      <Button type="submit" @click="onSubmit">Register</Button>
+      <Button type="submit" @click="onSubmit">Login</Button>
     </CardFooter>
   </Card>
 </template>
 
-<style lang="scss" scoped>
-#register-form {
+<style scoped>
+#login-form {
   Input {
     margin-bottom: 10px;
   }
