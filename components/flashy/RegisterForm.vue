@@ -32,14 +32,14 @@ const onSubmit = handleSubmit((values) => {
     </CardHeader>
     <CardContent>
       <form @submit.prevent="onSubmit">
-        <FormField v-slot="{ componentField }" name="email">
+        <!-- <FormField v-slot="{ componentField }" name="email">
           <FormItem v-auto-animate>
             <FormControl>
               <Input type="email" placeholder="Email" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
-        </FormField>
+        </FormField> -->
         <FormField v-slot="{ componentField }" name="username">
           <FormItem v-auto-animate>
             <FormControl>
