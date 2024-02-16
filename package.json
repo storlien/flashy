@@ -20,6 +20,8 @@
   "dependencies": {
     "@formkit/auto-animate": "^0.8.1",
     "@nuxtjs/tailwindcss": "^6.11.3",
+    "@tanstack/vue-table": "^8.12.0",
+    "@types/uuid": "^9.0.8",
     "@vee-validate/zod": "^4.12.5",
     "@vueuse/core": "^10.7.2",
     "class-variance-authority": "^0.7.0",
@@ -28,6 +30,7 @@
     "radix-vue": "^1.4.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^9.0.1",
     "vee-validate": "^4.12.5",
     "zod": "^3.22.4"
   }
