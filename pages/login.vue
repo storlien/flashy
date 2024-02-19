@@ -6,8 +6,8 @@ import LoginForm from "../components/flashy/LoginForm.vue";
 <template>
   <Tabs id="tabs" default-value="login">
     <TabsList id="tabsList">
-      <TabsTrigger value="login">Login</TabsTrigger>
-      <TabsTrigger value="register">Register</TabsTrigger>
+      <TabsTrigger value="login">Logg inn</TabsTrigger>
+      <TabsTrigger value="register">Registrer</TabsTrigger>
     </TabsList>
     <TabsContent value="register">
       <RegisterForm></RegisterForm>
