@@ -5,9 +5,11 @@ import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const config: FirebaseOptions = {
-    apiKey: process.env.API_KEY,
-    projectId: process.env.PROJECT_ID
+    apiKey: 'AIzaSyDFEhtsAA0IkzSD6PRJHFw6zfAdFee2OZc',
+    projectId: 'flashy-4e8c5',
 }
+
+console.log(config.apiKey);
 
 const app = initializeApp(config);
 const db = getFirestore(app);
