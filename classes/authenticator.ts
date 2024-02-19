@@ -1,18 +1,18 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, type UserCredential } from 'firebase/auth';
-import { Backend } from './backend';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, type UserCredential, type Auth } from 'firebase/auth';
+import type { FirebaseApp } from 'firebase/app';
 
 class Authenticator {
-  private readonly auth: any;
+  private readonly auth: Auth;
   
-  constructor {
-    this.auth = getAuth(Backend.app);
+  constructor(app: FirebaseApp) {
+    this.auth = getAuth(app);
   }
 
 
   /** Register a new User using email and password. */
   public async register(email: string, password: string): Promise<UserCredential | null> {
     try {
-      const credentials = await createUserWithEmailAndPassword(Authenticator.auth, email, password);
+      const credentials = await createUserWithEmailAndPassword(this.auth, email, password);
 
       console.log(credentials.user);
       return credentials;
@@ -26,7 +26,7 @@ class Authenticator {
   /** Login using email and password. */
   public async login(email: string, password: string): Promise<UserCredential | null> {
     try {
-      const credentials = await signInWithEmailAndPassword(Authenticator.auth, email, password);
+      const credentials = await signInWithEmailAndPassword(this.auth, email, password);
 
       console.log(credentials.user);
       return credentials;

@@ -11,7 +11,7 @@ class Backend {
     public static readonly app = initializeApp(Backend.config);
     public static readonly db = getFirestore();
 
-    public static readonly auth: Authenticator = new Authenticator();
+    public static readonly auth: Authenticator = new Authenticator(Backend.app);
 }
 
 export {
