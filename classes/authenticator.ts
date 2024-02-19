@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, ty
 
 class Authenticator {
   private readonly auth: Auth;
+  private credentials: UserCredential | undefined;
   
   constructor(app: FirebaseApp) {
     this.auth = getAuth(app);
@@ -15,7 +16,7 @@ class Authenticator {
       const credentials = await createUserWithEmailAndPassword(this.auth, email, password);
 
       console.log(credentials.user);
-      return credentials;
+      return this.credentials = credentials;
     } catch (error: any) {
       Authenticator.logError(error);
 
@@ -29,7 +30,7 @@ class Authenticator {
       const credentials = await signInWithEmailAndPassword(this.auth, email, password);
 
       console.log(credentials.user);
-      return credentials;
+      return this.credentials = credentials;
     } catch (error: any) {
       Authenticator.logError(error);
       return null;

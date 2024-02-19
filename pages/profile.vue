@@ -44,6 +44,10 @@
 import type { FlashcardSet } from './profile/columns';
 import { columns } from './profile/columns';
 
+definePageMeta({
+  middleware: 'auth',
+});
+
 const data = ref<FlashcardSet[]>([]);
 
 function onRowClick(id: string) {

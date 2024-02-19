@@ -68,6 +68,11 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from '@/components/ui/checkbox'
+
+definePageMeta({
+  middleware: 'auth',
+});
+
 type QuestionAnswer = {
     id: string;
     question: string;
