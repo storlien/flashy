@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@types/firebase": "^3.2.1",
     "nuxt": "^3.10.0",
     "sass": "^1.70.0",
     "shadcn-nuxt": "^0.8.7",
@@ -26,6 +27,8 @@
     "@vueuse/core": "^10.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "firebase": "^10.8.0",
+    "firebase-admin": "^12.0.0",
     "lucide-vue-next": "^0.321.0",
     "radix-vue": "^1.4.0",
     "tailwind-merge": "^2.2.1",
