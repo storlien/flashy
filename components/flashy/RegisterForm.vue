@@ -1,20 +1,24 @@
 <script setup lang="ts">
-import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
 import { vAutoAnimate } from "@formkit/auto-animate/vue";
+import { toTypedSchema } from "@vee-validate/zod";
+import { useForm } from "vee-validate";
+import * as z from "zod";
+
+const router = useRouter();
 
 const formSchema = toTypedSchema(
   z.object({
-    username: z.string().min(2).max(50), //add check if username is taken
+    email: z.string().email("Must be a valid email"),
     password: z
       .string()
       .min(6)
       .max(25)
       .regex(/.*[0-9].*/, "Password must contain at least one number"),
-    email: z.string().email("Must be a valid email"),
   })
 );
+
+import { useRouter } from "vue-router";
+
 
 const { handleSubmit } = useForm({
   validationSchema: formSchema,
@@ -22,13 +26,16 @@ const { handleSubmit } = useForm({
 
 const onSubmit = handleSubmit((values) => {
   console.log("Submitted");
+  router.push({ name: 'profile' })
 });
+
+
 </script>
 
 <template>
   <Card id="register-form">
     <CardHeader>
-      <CardTitle>Register</CardTitle>
+      <CardTitle>Registrer</CardTitle>
     </CardHeader>
     <CardContent>
       <form @submit.prevent="onSubmit">
@@ -40,14 +47,10 @@ const onSubmit = handleSubmit((values) => {
             <FormMessage />
           </FormItem>
         </FormField> -->
-        <FormField v-slot="{ componentField }" name="username">
+        <FormField v-slot="{ componentField }" name="email">
           <FormItem v-auto-animate>
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Username"
-                v-bind="componentField"
-              />
+              <Input type="text" placeholder="E-post" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -55,11 +58,7 @@ const onSubmit = handleSubmit((values) => {
         <FormField v-slot="{ componentField }" name="password">
           <FormItem v-auto-animate>
             <FormControl>
-              <Input
-                type="password"
-                placeholder="Password"
-                v-bind="componentField"
-              />
+              <Input type="password" placeholder="Passord" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -67,7 +66,7 @@ const onSubmit = handleSubmit((values) => {
       </form>
     </CardContent>
     <CardFooter>
-      <Button type="submit" @click="onSubmit">Register</Button>
+      <Button type="submit" @click="onSubmit">Registrer</Button>
     </CardFooter>
   </Card>
 </template>
