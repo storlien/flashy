@@ -1,14 +1,10 @@
 <script setup lang="ts">
-    import { createApp } from 'vue'
-    import App from '@/app.vue'
-    // import router from '@/router/router' // Import the router
-
-    // createApp(App).use(router).mount('#app')
+definePageMeta({
+    middleware: 'auth',
+});
 </script>
 
-<template>
-    
-</template>
+<template></template>
 
 <style lang="scss">
 .a {}

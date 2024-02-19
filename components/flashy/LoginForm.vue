@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
 import { vAutoAnimate } from "@formkit/auto-animate/vue";
-import {useRouter} from "vue-router";
-
+import { toTypedSchema } from "@vee-validate/zod";
+import { useForm } from "vee-validate";
+import { useRouter } from "vue-router";
+import * as z from "zod";
+import server from "~/classes/server";
 
 const formSchema = toTypedSchema(
   z.object({
@@ -19,11 +19,12 @@ const { handleSubmit } = useForm({
 
 const router = useRouter();
 
-//router.addRoute({ name: 'profile', path: '/profile', component: profile });
-console.log(router.getRoutes());
-const onSubmit = handleSubmit((values) => {
-  console.log("Submitted");
-  router.push({name: 'profile'})
+const onSubmit = handleSubmit(async (formData) => {
+  const credentials = await server.auth.login(formData.email, formData.password);
+
+  if (!credentials) return; 
+  
+  router.push({name: 'profile'});
 });
 </script>
 
@@ -45,11 +46,7 @@ const onSubmit = handleSubmit((values) => {
         <FormField v-slot="{ componentField }" name="password">
           <FormItem v-auto-animate>
             <FormControl>
-              <Input
-                type="password"
-                placeholder="Passord"
-                v-bind="componentField"
-              />
+              <Input type="password" placeholder="Passord" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
