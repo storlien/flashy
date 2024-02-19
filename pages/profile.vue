@@ -41,8 +41,8 @@
 </style>
   
 <script setup lang="ts">
-import type { FlashcardSet } from './profile/columns';
-import { columns } from './profile/columns';
+import type { FlashcardSet } from '~/classes/columns';
+import { columns } from '~/classes/columns';
 
 definePageMeta({
   middleware: 'auth',
@@ -84,4 +84,4 @@ async function getData(): Promise<FlashcardSet[]> {
 onMounted(async () => {
   data.value = await getData();
 });
-</script>
+</script>../classes/columns../classes/columns

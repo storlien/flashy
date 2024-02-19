@@ -9,7 +9,6 @@ class Authenticator {
     this.auth = getAuth(app);
   }
 
-
   /** Register a new User using email and password. */
   public async register(email: string, password: string): Promise<UserCredential | null> {
     try {
