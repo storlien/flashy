@@ -2,7 +2,9 @@
 import { vAutoAnimate } from "@formkit/auto-animate/vue";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
+import { useRouter } from "vue-router";
 import * as z from "zod";
+import server from "~/classes/server";
 
 const router = useRouter();
 
@@ -17,16 +19,13 @@ const formSchema = toTypedSchema(
   })
 );
 
-import { useRouter } from "vue-router";
-import { Authenticator } from "~/classes/authenticator";
-import { Backend } from "~/classes/backend";
 
 const { handleSubmit } = useForm({
   validationSchema: formSchema,
 });
 
 const onSubmit = handleSubmit(async (formData) => {
-  const credentials = await Backend.auth.register(formData.email, formData.password);
+  const credentials = await server.auth.register(formData.email, formData.password);
 
   if (!credentials) return; 
   

@@ -1,5 +1,5 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, type UserCredential, type Auth } from 'firebase/auth';
 import type { FirebaseApp } from 'firebase/app';
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, type Auth, type UserCredential } from 'firebase/auth';
 
 class Authenticator {
   private readonly auth: Auth;
@@ -47,4 +47,4 @@ class Authenticator {
 
 export {
   Authenticator
-}
+};
