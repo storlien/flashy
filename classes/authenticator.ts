@@ -1,21 +1,13 @@
-import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, type UserCredential } from 'firebase/auth';
-
-// Your Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  projectId: process.env.PROJECT_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import { FirestoreService } from './firestore_service';
 
 class Authenticator {
+  public static readonly auth = getAuth(FirestoreService.app);
+
   /** Register a new User using email and password. */
   public static async register(email: string, password: string): Promise<UserCredential | null> {
     try {
-      const credentials = await createUserWithEmailAndPassword(auth, email, password);
+      const credentials = await createUserWithEmailAndPassword(Authenticator.auth, email, password);
 
       console.log(credentials.user);
       return credentials;
@@ -29,7 +21,7 @@ class Authenticator {
   /** Login using email and password. */
   public static async login(email: string, password: string): Promise<UserCredential | null> {
     try {
-      const credentials = await signInWithEmailAndPassword(auth, email, password);
+      const credentials = await signInWithEmailAndPassword(Authenticator.auth, email, password);
 
       console.log(credentials.user);
       return credentials;
