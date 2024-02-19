@@ -12,7 +12,12 @@ type FlashcardSet = {
 }
 
 type FlashcardSetPrefs = {
-    username: String;
-    difficult: String[]; // List of cards marked as difficult by user
-    completed: String[]; // List of cards the user has marked as completed
+    userId: String;
+    setId: String;
+
+    /** List of card ids marked as difficult by user */
+    difficult: String[];
+
+    /** List of card ids the user has marked as completed */
+    completed: String[];
 }
