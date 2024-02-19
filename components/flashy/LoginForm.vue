@@ -5,7 +5,6 @@ import * as z from "zod";
 import { vAutoAnimate } from "@formkit/auto-animate/vue";
 import {useRouter} from "vue-router";
 
-
 const formSchema = toTypedSchema(
   z.object({
     email: z.string(), //check with database
@@ -19,9 +18,8 @@ const { handleSubmit } = useForm({
 
 const router = useRouter();
 
-//router.addRoute({ name: 'profile', path: '/profile', component: profile });
 console.log(router.getRoutes());
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit((formData) => {
   console.log("Submitted");
   router.push({name: 'profile'})
 });

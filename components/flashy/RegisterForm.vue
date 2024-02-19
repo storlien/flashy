@@ -18,15 +18,19 @@ const formSchema = toTypedSchema(
 );
 
 import { useRouter } from "vue-router";
-
+import { Authenticator } from "~/classes/authenticator";
+import { Backend } from "~/classes/backend";
 
 const { handleSubmit } = useForm({
   validationSchema: formSchema,
 });
 
-const onSubmit = handleSubmit((values) => {
-  console.log("Submitted");
-  router.push({ name: 'profile' })
+const onSubmit = handleSubmit(async (formData) => {
+  const credentials = await Backend.auth.register(formData.email, formData.password);
+
+  if (!credentials) return; 
+  
+  router.push({name: 'profile'});
 });
 
 

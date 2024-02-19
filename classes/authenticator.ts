@@ -1,11 +1,16 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, type UserCredential } from 'firebase/auth';
-import { FirestoreService } from './firestore_service';
+import { Backend } from './backend';
 
 class Authenticator {
-  public static readonly auth = getAuth(FirestoreService.app);
+  private readonly auth: any;
+  
+  constructor {
+    this.auth = getAuth(Backend.app);
+  }
+
 
   /** Register a new User using email and password. */
-  public static async register(email: string, password: string): Promise<UserCredential | null> {
+  public async register(email: string, password: string): Promise<UserCredential | null> {
     try {
       const credentials = await createUserWithEmailAndPassword(Authenticator.auth, email, password);
 
@@ -19,7 +24,7 @@ class Authenticator {
   }
 
   /** Login using email and password. */
-  public static async login(email: string, password: string): Promise<UserCredential | null> {
+  public async login(email: string, password: string): Promise<UserCredential | null> {
     try {
       const credentials = await signInWithEmailAndPassword(Authenticator.auth, email, password);
 
