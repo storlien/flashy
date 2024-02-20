@@ -6,6 +6,8 @@ type Flashcard = {
 
 type FlashcardSet = {
     id: String;
+    userId: String;
+    public: Boolean;
     name: String;
     category: String;
     flashcards: Flashcard[];

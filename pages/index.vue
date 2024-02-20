@@ -2,6 +2,11 @@
 definePageMeta({
     middleware: 'auth',
 });
+
+import server from '~/classes/server';
+
+server.retrieveFlashcardSets();
+
 </script>
 
 <template></template>
