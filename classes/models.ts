@@ -23,3 +23,9 @@ type FlashcardSetPrefs = {
     /** List of card ids the user has marked as completed */
     completed: string[];
 }
+
+export {
+    type Flashcard,
+    type FlashcardSet,
+    type FlashcardSetPrefs
+}
