@@ -2,14 +2,6 @@ import { h } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import DropdownAction from '@/components/DataTableDropDown.vue';
 
-type FlashcardSet = {
-    id: string,
-    name: string
-    category: string,
-    creator: string,
-    cards: number
-}
-
 const columns: ColumnDef<FlashcardSet>[] = [
     {
         accessorKey: 'name',
@@ -61,6 +53,5 @@ const columns: ColumnDef<FlashcardSet>[] = [
 ]
 
 export {
-    columns,
-    type FlashcardSet,
+    columns
 }

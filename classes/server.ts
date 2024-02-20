@@ -2,7 +2,9 @@ import type { FirebaseApp } from 'firebase/app';
 import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { addDoc, collection, getFirestore } from 'firebase/firestore';
+import { addDoc, collection, getFirestore, getDocs } from 'firebase/firestore';
+
+import type { Flashcard, FlashcardSet } from '~/classes/models';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -19,6 +21,32 @@ class Server {
 
     constructor(app: FirebaseApp) {
         this.auth = new Authenticator(app);
+    }
+
+    public async retrieveFlashcardSets(): Promise<FlashcardSet[]> {
+        const collectionRef = collection(db, 'flashcard-sets');
+        let flashcardSets: FlashcardSet[] = [];
+
+        try {
+            const snapshot = await getDocs(collectionRef);
+
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return flashcardSets;
+            }
+
+            snapshot.forEach(doc => {
+                flashcardSets.push(doc.data() as FlashcardSet);
+            });
+
+            console.log(flashcardSets);
+
+            return flashcardSets;
+
+        } catch (e) {
+            console.error('Error getting documents', e);
+            return flashcardSets;
+        }
     }
 
     public async createFlashcardSet(name: string, category: string, isPublic: boolean, flashcards: Flashcard[]): Promise<FlashcardSet | null> {
