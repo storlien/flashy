@@ -4,7 +4,15 @@ import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, ty
 class Authenticator {
   private readonly auth: Auth;
   private credentials: UserCredential | undefined;
-  
+
+  public isLoggedIn(): boolean { 
+    return this.credentials !== undefined; 
+  }
+
+  public getUserId(): string | undefined{
+    return this.credentials?.user.uid;
+  }
+
   constructor(app: FirebaseApp) {
     this.auth = getAuth(app);
   }
@@ -33,14 +41,14 @@ class Authenticator {
     } catch (error: any) {
       Authenticator.logError(error);
       return null;
-    } 
+    }
   }
-  
+
   /** Log an error caught in a try-catch. */
   private static logError(error: any) {
     const errorCode = error.code;
     const errorMessage = error.message;
-  
+
     console.error(errorCode, errorMessage);
   }
 }
