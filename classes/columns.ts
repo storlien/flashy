@@ -1,6 +1,7 @@
 import { h } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import DropdownAction from '@/components/DataTableDropDown.vue';
+import type { Flashcard, FlashcardSet } from './models';
 
 const columns: ColumnDef<FlashcardSet>[] = [
     {
@@ -12,15 +13,15 @@ const columns: ColumnDef<FlashcardSet>[] = [
             return h('div', { class: 'text-right font-medium' }, name);
         },
     },
-    {
-        accessorKey: 'creator',
-        header: () => h('div', { class: 'text-right' }, 'Skaper'),
-        cell: ({ row }) => {
-            const creator = row.getValue('creator') as unknown as string;
+    // {
+    //     accessorKey: 'creator',
+    //     header: () => h('div', { class: 'text-right' }, 'Skaper'),
+    //     cell: ({ row }) => {
+    //         const creator = row.getValue('creator') as unknown as string;
 
-            return h('div', { class: 'text-right font-medium' }, creator);
-        },
-    },
+    //         return h('div', { class: 'text-right font-medium' }, creator);
+    //     },
+    // },
     {
         accessorKey: 'category',
         header: () => h('div', { class: 'text-right' }, 'Kategori'),
@@ -31,12 +32,12 @@ const columns: ColumnDef<FlashcardSet>[] = [
         },
     },
     {
-        accessorKey: 'cards',
+        accessorKey: 'flashcards',
         header: () => h('div', { class: 'text-right' }, 'Antall Kort'),
         cell: ({ row }) => {
-            const cards = Number.parseFloat(row.getValue('cards'));
+            const flashcards = row.getValue('flashcards') as Flashcard[];
 
-            return h('div', { class: 'text-right font-medium' }, cards);
+            return h('div', { class: 'text-right font-medium' }, flashcards.length);
         },
     },
     {
