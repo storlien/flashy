@@ -18,8 +18,8 @@ type FlashcardSetPrefs = {
     setId: string;
 
     /** List of card ids marked as difficult by user */
-    difficult: String[];
+    difficult: string[];
 
     /** List of card ids the user has marked as completed */
-    completed: String[];
+    completed: string[];
 }
