@@ -1,19 +1,21 @@
 type Flashcard = {
-    id: String;
-    question: String;
-    answer: String;
+    id: string;
+    question: string;
+    answer: string;
 }
 
 type FlashcardSet = {
-    id: String;
-    name: String;
-    category: String;
+    id: string;
+    userId: string;
+    public: boolean;
+    name: string;
+    category: string;
     flashcards: Flashcard[];
 }
 
 type FlashcardSetPrefs = {
-    userId: String;
-    setId: String;
+    userId: string;
+    setId: string;
 
     /** List of card ids marked as difficult by user */
     difficult: String[];
