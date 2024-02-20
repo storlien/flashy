@@ -9,6 +9,10 @@ class Authenticator {
     return this.credentials !== undefined; 
   }
 
+  public getUserId(): string | undefined{
+    return this.credentials?.user.uid;
+  }
+
   constructor(app: FirebaseApp) {
     this.auth = getAuth(app);
   }

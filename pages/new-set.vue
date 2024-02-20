@@ -2,7 +2,7 @@
     <div>
         <Button id="avbrytKnapp" type="submit"><NuxtLink to="./profile">Avbryt</NuxtLink></Button>
         <div class="items-top flex gap-x-2">
-        <Checkbox id="terms1" />
+        <Checkbox id="terms1" :model-value="isPublic"/>
         <div class="grid gap-1.5 leading-none">
         <label
         for="terms1"
@@ -72,6 +72,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import server from '~/classes/server';
 
 const name = ref<string>('');
+const isPublic = ref<boolean>(false);
 const category = ref<string>('');
 
 definePageMeta({
@@ -87,7 +88,8 @@ function removeRow(index: number) {
     rows.value.splice(index, 1);
 }
 async function createSet() {
-    const set = await server.createFlashcardSet(name.value, category.value, rows.value);
+    console.log(name.value, category.value, isPublic.value, rows.value);
+    const set = await server.createFlashcardSet(name.value, category.value, isPublic.value, rows.value);
 
     if (set) {
         console.log("Settet er lagret");

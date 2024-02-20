@@ -7,7 +7,7 @@ type Flashcard = {
 type FlashcardSet = {
     id: string;
     userId: string;
-    public: boolean;
+    isPublic: boolean;
     name: string;
     category: string;
     flashcards: Flashcard[];
