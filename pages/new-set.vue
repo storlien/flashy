@@ -72,6 +72,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from '@/components/ui/checkbox'
 import server from '~/classes/server';
 import { useRouter } from 'vue-router';
+import type { Flashcard } from '~/classes/models';
 
 const router = useRouter();
 
