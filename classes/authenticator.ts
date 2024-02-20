@@ -22,7 +22,6 @@ class Authenticator {
     try {
       const credentials = await createUserWithEmailAndPassword(this.auth, email, password);
 
-      console.log(credentials.user);
       return this.credentials = credentials;
     } catch (error: any) {
       Authenticator.logError(error);
@@ -36,7 +35,6 @@ class Authenticator {
     try {
       const credentials = await signInWithEmailAndPassword(this.auth, email, password);
 
-      console.log(credentials.user);
       return this.credentials = credentials;
     } catch (error: any) {
       Authenticator.logError(error);

@@ -2,7 +2,7 @@
     <div>
         <Button id="avbrytKnapp" type="submit"><NuxtLink to="./profile">Avbryt</NuxtLink></Button>
         <div class="items-top flex gap-x-2">
-        <Checkbox id="terms1" :model-value="isPublic"/>
+        <Checkbox id="terms1" v-model="isPublic"/>
         <div class="grid gap-1.5 leading-none">
         <label
         for="terms1"
@@ -16,12 +16,13 @@
         </div>
     </div>
         
-        <Input id="Navn" placeholder="Navn" :model-value="name"/>
-        <Input id="Category" placeholder="Kategori" :model-value="category"/>
+        <!--Bind this input to name ref -->
+        <Input id="Navn" placeholder="Navn" v-model="name"/>
+        <Input id="Category" placeholder="Kategori" v-model="category"/>
         <div v-for="row, index in rows" class="row" :key="row.id">
             <p>{{ index + 1 }}</p>
-            <Input type="Spørsmål" placeholder="Spørsmål"/>
-            <Input type="Svar" placeholder="Svar" />
+            <Input v-model="row.question" type="Spørsmål" placeholder="Spørsmål"/>
+            <Input v-model="row.answer" type="Svar" placeholder="Svar" />
             <Button @click="removeRow(index)">X</Button>
         </div>
         <div class="button-container">
@@ -70,10 +71,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from '@/components/ui/checkbox'
 import server from '~/classes/server';
+import { useRouter } from 'vue-router';
 
-const name = ref<string>('');
-const isPublic = ref<boolean>(false);
-const category = ref<string>('');
+const router = useRouter();
+
+const name = ref('');
+const category = ref('');
+const isPublic = ref(false);
 
 definePageMeta({
   middleware: 'auth',
@@ -93,6 +97,8 @@ async function createSet() {
 
     if (set) {
         console.log("Settet er lagret");
+        router.push({name: 'profile'});
+        
     } else {
         console.log("Ånei, noe gikk galt");
     }
