@@ -1,28 +1,44 @@
 <template>
-  <!-- <div :style="{height: '25vh'}"></div> -->
   <div id="profile">
-    <Button id="logout-button">
-      <NuxtLink to="/login">Logg ut</NuxtLink>
-    </Button>
-    <div :style="{ height: '20vh' }"></div>
-    <div id="table-container">
-      <Button type="submit">
-        <NuxtLink to="/new-set">Nytt Sett</NuxtLink>
+    <div id="profile-left">
+      <Button id="logout-button">
+        <NuxtLink to="/login">Logg ut</NuxtLink>
       </Button>
-      <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />
+      <ManageProfile id="editprofile"></ManageProfile>
+    </div>
+    <div id="center-column">
+      <div id="hei" :style="{ height: '15vh' }"></div>
+      <div id="table-container">
+        <Button type="submit">
+          <NuxtLink to="/new-set">Nytt Sett</NuxtLink>
+        </Button>
+        <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />
+      </div>
     </div>
   </div>
 </template>
+
   
 <style lang="scss">
-#profile {
-  padding: 10vh 25vw;
+
+#profile-left {
+  display: grid;
+  padding: 10px;
+  grid-auto-columns: min-content;
+  grid-auto-flow: column;
+  row-gap: 10px;
+  column-gap: 5px;
+  justify-items: start;
+  align-items: start;
 }
 
-#logout-button {
-  position: absolute;
-  top: 10px;
-  left: 10px;
+#profile {
+  display: grid;
+  position: relative;
+
+  width: 100vw;
+
+  grid-template-columns: 1fr 2fr 1fr;
 }
 
 #table-container {
@@ -30,7 +46,7 @@
   display: flex;
   flex-direction: column;
 
-  align-items: end;
+  align-items: flex-end;
   justify-content: stretch;
   row-gap: 10px;
 
@@ -63,4 +79,4 @@ async function getData(): Promise<FlashcardSet[]> {
 onMounted(async () => {
   data.value = await getData();
 });
-</script>../classes/columns../classes/columns
+</script>
