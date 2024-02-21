@@ -2,9 +2,9 @@ import type { FirebaseApp } from 'firebase/app';
 import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { addDoc, collection, getFirestore, getDocs, doc, getDoc } from 'firebase/firestore';
+import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 
-import type { Flashcard, FlashcardSet } from '~/classes/models';
+import type { Flashcard, FlashcardSet, FlashcardSetPrefs } from '~/classes/models';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -54,7 +54,7 @@ class Server {
     public async getFlashcardSet(id: string): Promise<FlashcardSet | null> {
         try {
             const docSnap = await getDoc(doc(db, 'flashcard-sets', id));
-    
+
             if (docSnap.exists()) {
                 return docSnap.data() as FlashcardSet;
             } else {
@@ -65,6 +65,26 @@ class Server {
             Server.logError(e);
             return null;
         }
+    }
+
+    /** Get user preferences for a set, if any. */
+    public async getUserSetPrefs(userId: string, setId: string): Promise<FlashcardSetPrefs | null> {
+        const collectionRef = collection(db, 'user-set-prefs');
+
+        const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
+        
+        if (docRef.exists()) {
+            return docRef.data() as FlashcardSetPrefs;
+        } else {
+            return null;
+        }
+    }
+
+    /** Update user preferences for a set. */
+    public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
+        const collectionRef = collection(db, 'user-set-prefs');
+        
+        await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
 
     public async createFlashcardSet(name: string, category: string, isPublic: boolean, flashcards: Flashcard[]): Promise<FlashcardSet | null> {

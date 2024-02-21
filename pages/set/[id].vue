@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import FlashCard from "@/components/flashy/FlashCard.vue";
 import { watchOnce } from "@vueuse/core";
-import type { Flashcard } from "~/classes/models";
+import type { Flashcard, FlashcardSet, FlashcardSetPrefs } from "~/classes/models";
 import server from "~/classes/server";
 import type { Carousel, CarouselApi } from "~/components/ui/carousel";
+
+definePageMeta({
+  middleware: 'auth',
+});
 
 const route = useRoute();
 const id = route.params.id;
 
+const flashcardSet = ref<FlashcardSet | undefined>();
 const flashCards = ref<Flashcard[]>([]);
-const difficultCards = ref<boolean[]>([]);
+const difficultCards = ref<Set<string>>(new Set());
 
 const api = ref<CarouselApi>();
 const totalCount = ref(0);
 const index = ref(0);
+
+const router = useRouter();
 
 function setApi(val: CarouselApi) {
   api.value = val
@@ -36,22 +43,64 @@ async function getFlashcardSet(id: string) {
   if (!set) return;
 
   flashCards.value = set.flashcards;
+  flashcardSet.value = set;
+}
+
+async function getPrefs() {
+  const userId = server.auth.getUserId();
+
+  if (!userId) return;
+  if (typeof id !== 'string') return;
+
+  const prefs = await server.getUserSetPrefs(userId, id);
+
+  if (!prefs) return;
+
+  difficultCards.value = new Set(prefs.difficult);
 }
 
 onMounted(async () => {
   if (typeof id === 'string') {
     await getFlashcardSet(id);
-  } else {
-    console.error('id is not a string:', id);
-  }
+    await getPrefs();
+  } 
 });
 
 function updateCardDifficulty() {
-  const difficult = difficultCards.value[index.value];
+  const questionId = flashCards.value[index.value].id;
+  const difficult = difficultCards.value.has(questionId);
 
-  difficultCards.value[index.value] = !difficult;
+  if (difficult) {
+    difficultCards.value.delete(questionId);
+  } else {
+    difficultCards.value.add(questionId);
+  }
+}
 
-  console.log(difficultCards.value);
+const isDifficultSlide = computed(() => {
+  if (flashCards.value.length == 0) return false;
+
+  const questionId = flashCards.value[index.value].id;
+  return difficultCards.value.has(questionId);
+});
+
+async function finish() {
+  const userId = server.auth.getUserId();
+
+  if (!userId) return;
+  if (!flashcardSet.value) return;
+  if (typeof id !== 'string') return;
+
+  const prefs: FlashcardSetPrefs = {
+    userId: userId,
+    setId: id,
+    difficult: Array.from(difficultCards.value),
+    completed: [],
+  };
+
+  await server.updateUserSetPrefs(prefs);
+
+  router.push({ name: 'profile' });
 }
 
 </script>
@@ -70,11 +119,11 @@ function updateCardDifficulty() {
       </Carousel>
       <label for="difficulty"
         class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        <Checkbox id="difficulty" @click="updateCardDifficulty" :checked="difficultCards[index]" />
+        <Checkbox id="difficulty" @click="updateCardDifficulty" :checked="isDifficultSlide" />
         Vanskelig
       </label>
     </div>
-    <Button class="mb-9">Fullfør</Button>
+    <Button class="mb-9" @click="finish">Fullfør</Button>
   </div>
 
   <!-- Exit button -->
@@ -92,6 +141,7 @@ function updateCardDifficulty() {
   align-items: center;
   height: 100vh;
 }
+
 #carousel-container {
   display: flex;
   justify-content: center;
@@ -109,5 +159,4 @@ function updateCardDifficulty() {
   width: 500px;
   user-select: none;
 }
-
 </style>
