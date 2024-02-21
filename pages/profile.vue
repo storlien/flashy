@@ -60,6 +60,14 @@
 import type { FlashcardSet } from '~/classes/models';
 import { columns } from '~/classes/columns';
 import server from '~/classes/server';
+import ManageProfile from '@/components/flashy/ManageProfile.vue';
+
+defineComponent({
+  components: {
+    ManageProfile,
+  },
+});
+
 
 definePageMeta({
   middleware: 'auth',
