@@ -42,7 +42,6 @@
 }
 
 #table-container {
-
   display: flex;
   flex-direction: column;
 
@@ -75,13 +74,23 @@ definePageMeta({
 
 const data = ref<FlashcardSet[]>([]);
 
-function onRowClick(id: string) {
-  alert(id);
+const router = useRouter();
+
+// console.log(router.getRoutes())
+
+function onRowClick(index: string) {
+  // alert(index);
+  const row = data.value[parseInt(index)];
+  const rowId = row.id;
+
+  console.log(row.id);
+
+  router.push({ path: `/set/${rowId}`});
+  // console.log(row);
 }
 
 async function getData(): Promise<FlashcardSet[]> {
-
-  return server.retrieveFlashcardSets();
+  return server.getFlashcardSets();
 }
 
 onMounted(async () => {

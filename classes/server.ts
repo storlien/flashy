@@ -2,7 +2,7 @@ import type { FirebaseApp } from 'firebase/app';
 import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { addDoc, collection, getFirestore, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getFirestore, getDocs, doc, getDoc } from 'firebase/firestore';
 
 import type { Flashcard, FlashcardSet } from '~/classes/models';
 
@@ -23,7 +23,7 @@ class Server {
         this.auth = new Authenticator(app);
     }
 
-    public async retrieveFlashcardSets(): Promise<FlashcardSet[]> {
+    public async getFlashcardSets(): Promise<FlashcardSet[]> {
         const collectionRef = collection(db, 'flashcard-sets');
         let flashcardSets: FlashcardSet[] = [];
 
@@ -36,7 +36,9 @@ class Server {
             }
 
             snapshot.forEach(doc => {
-                flashcardSets.push(doc.data() as FlashcardSet);
+                let flashcardSet = doc.data() as FlashcardSet;
+                flashcardSet.id = doc.id;
+                flashcardSets.push(flashcardSet);
             });
 
             console.log(flashcardSets);
@@ -44,8 +46,24 @@ class Server {
             return flashcardSets;
 
         } catch (e) {
-            console.error('Error getting documents', e);
+            Server.logError(e);
             return flashcardSets;
+        }
+    }
+
+    public async getFlashcardSet(id: string): Promise<FlashcardSet | null> {
+        try {
+            const docSnap = await getDoc(doc(db, 'flashcard-sets', id));
+    
+            if (docSnap.exists()) {
+                return docSnap.data() as FlashcardSet;
+            } else {
+                console.log('No such document!');
+                return null;
+            }
+        } catch (e) {
+            Server.logError(e);
+            return null;
         }
     }
 
