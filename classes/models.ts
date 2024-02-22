@@ -1,3 +1,9 @@
+type User = {
+    id: string;
+    name: string;
+    favorites: string[];
+}
+
 type Flashcard = {
     id: string;
     question: string;

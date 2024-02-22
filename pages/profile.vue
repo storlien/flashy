@@ -1,33 +1,39 @@
 <template>
   <div id="profile">
-    <div id="profile-left">
-      <Button id="logout-button">
-        <NuxtLink to="/login">Logg ut</NuxtLink>
-      </Button>
-      <ManageProfile id="editprofile"></ManageProfile>
-    </div>
+    <div></div>
     <div id="center-column">
-      <div id="hei" :style="{ height: '15vh' }"></div>
-      <div id="table-container">
-        <Button type="submit">
-          <NuxtLink to="/new-set">Nytt Sett</NuxtLink>
+      <div id="profile-left">
+        <Button id="logout-button">
+          <NuxtLink to="/login">Logg ut</NuxtLink>
         </Button>
-        <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />
+        <ManageProfile id="editprofile"></ManageProfile>
       </div>
+      
+      <div class="space" :style="{ height: '10vh' }"></div>
+      
+      <div id="table-container">
+        <div id="my-flashcards-header">
+          <h1>Mine flashcards</h1>
+          <Button type="submit">
+            <NuxtLink to="/new-set">Nytt sett</NuxtLink>
+          </Button>
+        </div>
+        <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />  
+      </div>
+
+      <div class="space" :style="{ height: '10vh' }"></div>
     </div>
   </div>
 </template>
 
-  
 <style lang="scss">
 
 #profile-left {
   display: grid;
-  padding: 10px;
   grid-auto-columns: min-content;
   grid-auto-flow: column;
   row-gap: 10px;
-  column-gap: 5px;
+  column-gap: 10px;
   justify-items: start;
   align-items: start;
 }
@@ -37,16 +43,23 @@
   position: relative;
 
   width: 100vw;
+  height: 100vh;
 
   grid-template-columns: 1fr 2fr 1fr;
 }
 
-#table-container {
+#my-flashcards-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 
+#table-container {
   display: flex;
   flex-direction: column;
 
-  align-items: flex-end;
+  // align-items: flex-end;
   justify-content: stretch;
   row-gap: 10px;
 
@@ -75,13 +88,23 @@ definePageMeta({
 
 const data = ref<FlashcardSet[]>([]);
 
-function onRowClick(id: string) {
-  alert(id);
+const router = useRouter();
+
+// console.log(router.getRoutes())
+
+function onRowClick(index: string) {
+  // alert(index);
+  const row = data.value[parseInt(index)];
+  const rowId = row.id;
+
+  console.log(row.id);
+
+  router.push({ path: `/set/${rowId}`});
+  // console.log(row);
 }
 
 async function getData(): Promise<FlashcardSet[]> {
-
-  return server.retrieveFlashcardSets();
+  return server.getUserFlashcardSets();
 }
 
 onMounted(async () => {

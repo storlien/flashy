@@ -2,9 +2,9 @@ import type { FirebaseApp } from 'firebase/app';
 import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { addDoc, collection, getFirestore, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 
-import type { Flashcard, FlashcardSet } from '~/classes/models';
+import type { Flashcard, FlashcardSet, FlashcardSetPrefs } from '~/classes/models';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -23,7 +23,11 @@ class Server {
         this.auth = new Authenticator(app);
     }
 
-    public async retrieveFlashcardSets(): Promise<FlashcardSet[]> {
+    public async getUserFlashcardSets(): Promise<FlashcardSet[]> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+        
         const collectionRef = collection(db, 'flashcard-sets');
         let flashcardSets: FlashcardSet[] = [];
 
@@ -36,7 +40,12 @@ class Server {
             }
 
             snapshot.forEach(doc => {
-                flashcardSets.push(doc.data() as FlashcardSet);
+                const flashcardSet = doc.data() as FlashcardSet;
+                flashcardSet.id = doc.id;
+
+                if (flashcardSet.userId === userId) {
+                    flashcardSets.push(flashcardSet);
+                }
             });
 
             console.log(flashcardSets);
@@ -44,9 +53,61 @@ class Server {
             return flashcardSets;
 
         } catch (e) {
-            console.error('Error getting documents', e);
+            Server.logError(e);
             return flashcardSets;
         }
+    }
+
+    public async getFlashcardSet(id: string): Promise<FlashcardSet | null> {
+        try {
+            const docSnap = await getDoc(doc(db, 'flashcard-sets', id));
+
+            if (docSnap.exists()) {
+                return docSnap.data() as FlashcardSet;
+            } else {
+                console.log('No such document!');
+                return null;
+            }
+        } catch (e) {
+            Server.logError(e);
+            return null;
+        }
+    }
+
+    public async deleteFlashcardSet(set: FlashcardSet): Promise<boolean> {
+        const userId = this.auth.getUserId();
+
+        if (!userId || userId !== set.userId) throw new Error('Unauthorized');
+        
+        try {
+            await deleteDoc(doc(db, 'flashcard-sets', set.id));
+
+            return true;
+        } catch (e) {
+            Server.logError(e);
+            
+            return false;
+        }
+    }
+
+    /** Get user preferences for a set, if any. */
+    public async getUserSetPrefs(userId: string, setId: string): Promise<FlashcardSetPrefs | null> {
+        const collectionRef = collection(db, 'user-set-prefs');
+
+        const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
+        
+        if (docRef.exists()) {
+            return docRef.data() as FlashcardSetPrefs;
+        } else {
+            return null;
+        }
+    }
+
+    /** Update user preferences for a set. */
+    public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
+        const collectionRef = collection(db, 'user-set-prefs');
+        
+        await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
 
     public async createFlashcardSet(name: string, category: string, isPublic: boolean, flashcards: Flashcard[]): Promise<FlashcardSet | null> {
