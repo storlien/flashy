@@ -6,7 +6,9 @@
                 <Button id="avbrytKnapp" variant="outline" type="submit">
                     <NuxtLink to="./profile">Avbryt</NuxtLink>
                 </Button>
-                <Button id="create-button" @click="createSet">Lagre</Button>
+                <Button id="create-button" @click="createSet" :disabled="!canSave()">
+                    Lagre
+                </Button>
             </div>
 
             <div class="space" :style="{ height: '10vh' }"></div>
@@ -99,6 +101,14 @@ const router = useRouter();
 const name = ref('');
 const category = ref('');
 const isPublic = ref(false);
+
+function canSave() {
+    if (name.value.length === 0) return false;
+    if (category.value.length === 0) return false;
+    if (rows.value.length === 0) return false;
+
+    return true;
+}
 
 definePageMeta({
     middleware: 'auth',
