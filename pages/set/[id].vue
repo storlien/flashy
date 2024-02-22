@@ -42,6 +42,9 @@ async function getFlashcardSet(id: string) {
 
   if (!set) return;
 
+  const flashcards = set.flashcards;
+
+
   flashCards.value = set.flashcards;
   flashcardSet.value = set;
 }
@@ -59,10 +62,28 @@ async function getPrefs() {
   difficultCards.value = new Set(prefs.difficult);
 }
 
+function shuffleCards(cards: Flashcard[], difficultCards: Set<string>) {
+  // Split the flashcards into two groups
+  const difficult = cards.filter(card => difficultCards.has(card.id));
+  const regular = cards.filter(card => !difficultCards.has(card.id));
+
+  // Shuffle each group
+  const shuffledDifficult = difficult.sort(() => Math.random() - 0.5);
+  const shuffledRegular = regular.sort(() => Math.random() - 0.5);
+
+  // Merge the groups back into one array
+  const shuffledFlashcards = [...shuffledDifficult, ...shuffledRegular];
+
+  // Update flashcards.value
+  flashCards.value = shuffledFlashcards;
+}
+
 onMounted(async () => {
   if (typeof id === 'string') {
-    await getFlashcardSet(id);
     await getPrefs();
+    await getFlashcardSet(id);
+
+    shuffleCards(flashCards.value, difficultCards.value);
   } 
 });
 

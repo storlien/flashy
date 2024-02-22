@@ -12,9 +12,12 @@
       <div class="space" :style="{ height: '10vh' }"></div>
       
       <div id="table-container">
-        <Button type="submit">
-          <NuxtLink to="/new-set">Nytt sett</NuxtLink>
-        </Button>
+        <div id="my-flashcards-header">
+          <h1>Mine flashcards</h1>
+          <Button type="submit">
+            <NuxtLink to="/new-set">Nytt sett</NuxtLink>
+          </Button>
+        </div>
         <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />  
       </div>
 
@@ -45,11 +48,18 @@
   grid-template-columns: 1fr 2fr 1fr;
 }
 
+#my-flashcards-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 #table-container {
   display: flex;
   flex-direction: column;
 
-  align-items: flex-end;
+  // align-items: flex-end;
   justify-content: stretch;
   row-gap: 10px;
 
