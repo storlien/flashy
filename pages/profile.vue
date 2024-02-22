@@ -90,7 +90,7 @@ function onRowClick(index: string) {
 }
 
 async function getData(): Promise<FlashcardSet[]> {
-  return server.getFlashcardSets();
+  return server.getUserFlashcardSets();
 }
 
 onMounted(async () => {

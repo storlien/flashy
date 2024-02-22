@@ -2,7 +2,7 @@ import type { FirebaseApp } from 'firebase/app';
 import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 
 import type { Flashcard, FlashcardSet, FlashcardSetPrefs } from '~/classes/models';
 
@@ -23,7 +23,11 @@ class Server {
         this.auth = new Authenticator(app);
     }
 
-    public async getFlashcardSets(): Promise<FlashcardSet[]> {
+    public async getUserFlashcardSets(): Promise<FlashcardSet[]> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+        
         const collectionRef = collection(db, 'flashcard-sets');
         let flashcardSets: FlashcardSet[] = [];
 
@@ -36,9 +40,12 @@ class Server {
             }
 
             snapshot.forEach(doc => {
-                let flashcardSet = doc.data() as FlashcardSet;
+                const flashcardSet = doc.data() as FlashcardSet;
                 flashcardSet.id = doc.id;
-                flashcardSets.push(flashcardSet);
+
+                if (flashcardSet.userId === userId) {
+                    flashcardSets.push(flashcardSet);
+                }
             });
 
             console.log(flashcardSets);
@@ -64,6 +71,22 @@ class Server {
         } catch (e) {
             Server.logError(e);
             return null;
+        }
+    }
+
+    public async deleteFlashcardSet(set: FlashcardSet): Promise<boolean> {
+        const userId = this.auth.getUserId();
+
+        if (!userId || userId !== set.userId) throw new Error('Unauthorized');
+        
+        try {
+            await deleteDoc(doc(db, 'flashcard-sets', set.id));
+
+            return true;
+        } catch (e) {
+            Server.logError(e);
+            
+            return false;
         }
     }
 
