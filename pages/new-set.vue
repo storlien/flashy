@@ -51,7 +51,7 @@
 
 #center-column {
     border: 2px solid #f0f0f0;
-    padding: 0 50px;
+    padding: 20px 50px;
 }
 
 #name-category {
@@ -76,7 +76,6 @@
 }
 
 #header-buttons {
-    padding: 20px 0;
     display: flex;
     justify-content: space-between;
 }

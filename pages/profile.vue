@@ -1,29 +1,32 @@
 <template>
   <div id="profile">
-    <div id="profile-left">
-      <Button id="logout-button">
-        <NuxtLink to="/login">Logg ut</NuxtLink>
-      </Button>
-      <ManageProfile id="editprofile"></ManageProfile>
-    </div>
+    <div></div>
     <div id="center-column">
-      <div id="hei" :style="{ height: '15vh' }"></div>
+      <div id="profile-left">
+        <Button id="logout-button">
+          <NuxtLink to="/login">Logg ut</NuxtLink>
+        </Button>
+        <ManageProfile id="editprofile"></ManageProfile>
+      </div>
+      
+      <div class="space" :style="{ height: '10vh' }"></div>
+      
       <div id="table-container">
         <Button type="submit">
           <NuxtLink to="/new-set">Nytt sett</NuxtLink>
         </Button>
-        <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />
+        <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />  
       </div>
+
+      <div class="space" :style="{ height: '10vh' }"></div>
     </div>
   </div>
 </template>
 
-  
 <style lang="scss">
 
 #profile-left {
   display: grid;
-  padding: 10px;
   grid-auto-columns: min-content;
   grid-auto-flow: column;
   row-gap: 10px;
@@ -37,6 +40,7 @@
   position: relative;
 
   width: 100vw;
+  height: 100vh;
 
   grid-template-columns: 1fr 2fr 1fr;
 }
