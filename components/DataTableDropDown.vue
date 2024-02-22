@@ -19,10 +19,6 @@ async function deleteSet(): Promise<void> {
   }
 }
 
-
-// function copy(id: string) {
-//   navigator.clipboard.writeText(id)
-// }
 </script>
 
 <template>

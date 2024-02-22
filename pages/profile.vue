@@ -10,7 +10,7 @@
       <div id="hei" :style="{ height: '15vh' }"></div>
       <div id="table-container">
         <Button type="submit">
-          <NuxtLink to="/new-set">Nytt Sett</NuxtLink>
+          <NuxtLink to="/new-set">Nytt sett</NuxtLink>
         </Button>
         <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />
       </div>
