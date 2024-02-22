@@ -33,7 +33,7 @@
   grid-auto-columns: min-content;
   grid-auto-flow: column;
   row-gap: 10px;
-  column-gap: 5px;
+  column-gap: 10px;
   justify-items: start;
   align-items: start;
 }
