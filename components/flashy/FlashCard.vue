@@ -34,8 +34,8 @@ const flipCard = () => {
 
 <style scoped>
 .card {
-  width: 1200px;
-  height: 600px;
+  width: 600px;
+  height: 400px;
   perspective: 2000px;
   cursor: pointer;
 }
@@ -62,12 +62,15 @@ const flipCard = () => {
   transform-origin: center;
   transform: scale(0.8);
 
+  transform-origin: center;
+  transform: scale(0.8);
+
   transition: transform 0.5s;
   transform-style: preserve-3d;
 }
 
 .card .content.flipped {
-  transform: scale(0.8) rotateX(180deg);
+  transform: scale(0.8) rotateY(180deg);
 }
 
 .front,

@@ -1,5 +1,5 @@
 <template>
-    <div class="favorite-button cursor-pointer ml-2" @click.stop="toggleFavorite" variant="default">
+    <div class="favorite-button cursor-pointer pl-0.5" @click.stop="toggleFavorite" variant="default">
         <img :src="HeartFilledIcon" v-if="favorite" class="heart-fill h-5 w-5 filled">
         <img :src="HeartIcon" v-else class="heart-outline h-5 w-5">
     </div>
