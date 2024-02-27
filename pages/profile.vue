@@ -100,7 +100,7 @@ function onRowClick(index: string) {
   console.log(row.id);
 
   router.push({ path: `/set/${rowId}`});
-  // console.log(row);
+  // console.log(row); 
 }
 
 async function getData(): Promise<FlashcardSet[]> {
