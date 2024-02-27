@@ -7,7 +7,7 @@
 
 <style>
 .heart-outline {
-    filter: invert(91%) sepia(17%) saturate(0%) hue-rotate(218deg) brightness(90%) contrast(99%);
+    filter: invert(98%) sepia(64%) saturate(45%) hue-rotate(257deg) brightness(116%) contrast(92%);
 }
 
 .heart-fill {
