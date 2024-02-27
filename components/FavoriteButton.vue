@@ -1,5 +1,5 @@
 <template>
-    <div class="favorite-button cursor-pointer pl-0.5" @click.stop="toggleFavorite" variant="default">
+    <div class="favorite-button cursor-pointer ml-2" @click.stop="toggleFavorite" variant="default">
         <img :src="HeartFilledIcon" v-if="favorite" class="heart-fill h-5 w-5 filled">
         <img :src="HeartIcon" v-else class="heart-outline h-5 w-5">
     </div>
@@ -7,7 +7,7 @@
 
 <style>
 .heart-outline {
-    filter: invert(98%) sepia(64%) saturate(45%) hue-rotate(257deg) brightness(116%) contrast(92%);
+    filter: invert(91%) sepia(17%) saturate(0%) hue-rotate(218deg) brightness(90%) contrast(99%);
 }
 
 .heart-fill {
