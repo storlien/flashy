@@ -42,9 +42,6 @@ async function getFlashcardSet(id: string) {
 
   if (!set) return;
 
-  const flashcards = set.flashcards;
-
-
   flashCards.value = set.flashcards;
   flashcardSet.value = set;
 }

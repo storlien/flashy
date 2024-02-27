@@ -36,7 +36,7 @@ const flipCard = () => {
 .card {
   width: 600px;
   height: 400px;
-  perspective: 500px;
+  perspective: 2000px;
   cursor: pointer;
 }
 
@@ -54,12 +54,15 @@ const flipCard = () => {
   height: 100%;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 
+  transform-origin: center;
+  transform: scale(0.8);
+
   transition: transform 0.5s;
   transform-style: preserve-3d;
 }
 
 .card .content.flipped {
-  transform: rotateY(180deg);
+  transform: scale(0.8) rotateY(180deg);
 }
 
 .front,
