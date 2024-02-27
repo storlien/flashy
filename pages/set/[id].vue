@@ -177,7 +177,8 @@ async function finish() {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 500px;
+  width: 2000px;
+  height: 600px;
   user-select: none;
 }
 </style>
