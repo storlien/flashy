@@ -3,16 +3,15 @@ import type { ColumnDef } from '@tanstack/vue-table';
 import DropdownAction from '@/components/DataTableDropDown.vue';
 import type { Flashcard, FlashcardSet } from './models';
 import FavoriteButton from '@/components/FavoriteButton.vue';
+import FavoriteButton from '@/components/FavoriteButton.vue';
 
 const columns: ColumnDef<FlashcardSet>[] = [
     {
         id: 'favorite',
         cell: ({ row }) => {
-            // const isFavorite = server.userSettingsCache?.favoriteSets.includes(row.original.id);
+            const set = row.original;
 
-            return h('div', { class: 'relative' }, h(FavoriteButton, {
-                setId: row.original.id,
-            }))
+            return h('div', { class: 'relative' }, h(FavoriteButton))
         },
     },
     {
@@ -55,6 +54,7 @@ const columns: ColumnDef<FlashcardSet>[] = [
         id: 'actions',
         enableHiding: false,
         cell: ({ row }) => {
+            const set = row.original;
             const set = row.original;
 
             return h('div', { class: 'relative' }, h(DropdownAction, {
