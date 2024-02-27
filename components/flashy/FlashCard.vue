@@ -62,12 +62,6 @@ const flipCard = () => {
   transform-origin: center;
   transform: scale(0.8);
 
-  transform-origin: center;
-  transform: scale(0.8);
-
-  transform-origin: center;
-  transform: scale(0.8);
-
   transition: transform 0.5s;
   transform-style: preserve-3d;
 }
