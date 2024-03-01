@@ -81,12 +81,14 @@ class Server {
 
         if (!userId || userId !== set.userId) throw new Error('Unauthorized');
 
+
         try {
             await deleteDoc(doc(db, 'flashcard-sets', set.id));
 
             return true;
         } catch (e) {
             Server.logError(e);
+
 
             return false;
         }
