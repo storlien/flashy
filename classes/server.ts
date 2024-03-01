@@ -29,6 +29,7 @@ class Server {
 
         if (!userId) throw new Error('Unauthorized');
 
+
         const collectionRef = collection(db, 'flashcard-sets');
         let flashcardSets: FlashcardSet[] = [];
 
@@ -97,6 +98,7 @@ class Server {
 
         const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
 
+
         if (docRef.exists()) {
             return docRef.data() as FlashcardSetPrefs;
         } else {
@@ -107,6 +109,7 @@ class Server {
     /** Update user preferences for a set. */
     public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
         const collectionRef = collection(db, 'user-set-prefs');
+
 
         await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
