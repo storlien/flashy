@@ -19,6 +19,7 @@
           </Button>
         </div>
         <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" on />  
+        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" on />  
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>

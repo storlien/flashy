@@ -3,7 +3,9 @@ import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
+import type { Flashcard, FlashcardSet, FlashcardSetPrefs, UserSettings } from '~/classes/models';
 import type { Flashcard, FlashcardSet, FlashcardSetPrefs, UserSettings } from '~/classes/models';
 
 const config: FirebaseOptions = {
