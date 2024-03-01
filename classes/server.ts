@@ -29,6 +29,7 @@ class Server {
 
         if (!userId) throw new Error('Unauthorized');
 
+
         const collectionRef = collection(db, 'flashcard-sets');
         let flashcardSets: FlashcardSet[] = [];
 
@@ -80,12 +81,14 @@ class Server {
 
         if (!userId || userId !== set.userId) throw new Error('Unauthorized');
 
+
         try {
             await deleteDoc(doc(db, 'flashcard-sets', set.id));
 
             return true;
         } catch (e) {
             Server.logError(e);
+
 
             return false;
         }
@@ -97,6 +100,7 @@ class Server {
 
         const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
 
+
         if (docRef.exists()) {
             return docRef.data() as FlashcardSetPrefs;
         } else {
@@ -107,6 +111,7 @@ class Server {
     /** Update user preferences for a set. */
     public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
         const collectionRef = collection(db, 'user-set-prefs');
+
 
         await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
@@ -144,7 +149,12 @@ class Server {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
+            console.log('User found');
             await updateDoc(docRef, { favoriteSets });
+            console.log('Successfully updated favorite sets');
+        } else {
+            console.log('No user found');
+            await setDoc(docRef, { favoriteSets });
             console.log('Successfully updated favorite sets');
         }
     }
@@ -160,15 +170,9 @@ class Server {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            const settings = docSnap.data() as UserSettings;
-            
-            this.userSettingsCache.name = settings.name;
-            this.userSettingsCache.email = settings.email;
-            this.userSettingsCache.favoriteSets = settings.favoriteSets;
-
-            return settings;
+            return docSnap.data() as UserSettings;
         } 
-
+        
         return null;
     }
 
@@ -193,10 +197,6 @@ class Server {
                 favoriteSets: [],
             };
             await setDoc(docRef, settings);
-
-            this.userSettingsCache.name = settings.name;
-            this.userSettingsCache.email = settings.email;
-            this.userSettingsCache.favoriteSets = settings.favoriteSets;
 
             return settings;
         }

@@ -71,6 +71,7 @@
   
 <script setup lang="ts">
 import type { FlashcardSet, UserSettings } from '~/classes/models';
+import type { FlashcardSet, UserSettings } from '~/classes/models';
 import { columns } from '~/classes/columns';
 import server from '~/classes/server';
 import ManageProfile from '@/components/flashy/ManageProfile.vue';
@@ -88,22 +89,20 @@ definePageMeta({
 
 const flashcardSets = ref<FlashcardSet[]>([]);
 const userSettings = ref<UserSettings | null>();
+const flashcardSets = ref<FlashcardSet[]>([]);
+const userSettings = ref<UserSettings | null>();
 
 const router = useRouter();
 
 
 function onRowClick(index: string) {
   const row = flashcardSets.value[parseInt(index)];
+  const row = flashcardSets.value[parseInt(index)];
   const rowId = row.id;
 
   // console.log(row.id);
 
   router.push({ path: `/set/${rowId}`});
-  // console.log(row); 
-}
-
-async function getData(): Promise<FlashcardSet[]> {
-  return server.getUserFlashcardSets();
 }
 
 onMounted(async () => {
@@ -114,6 +113,6 @@ onMounted(async () => {
     userSettings.value = await server.createUserSettings();
   }
 
-  // console.log(userSettings.value);
+  console.log(userSettings.value);
 });
 </script>
