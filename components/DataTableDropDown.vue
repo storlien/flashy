@@ -19,6 +19,13 @@ async function deleteSet(): Promise<void> {
   }
 }
 
+function editSet(): void {
+  // navigateTo('/edit-set');
+  const rowId = props.set.id;
+
+router.push({ path: `/edit-set/${rowId}`});
+}
+
 </script>
 
 <template>
@@ -37,6 +44,7 @@ async function deleteSet(): Promise<void> {
       <DropdownMenuSeparator /> -->
       <!-- <DropdownMenuItem>Rediger</DropdownMenuItem> -->
       <DropdownMenuItem @click="deleteSet">Slett</DropdownMenuItem>
+      <DropdownMenuItem @click="editSet">Rediger</DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
-</template>set
+</template>
