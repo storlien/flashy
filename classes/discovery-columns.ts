@@ -5,6 +5,12 @@ import type { Flashcard, FlashcardSet } from './models';
 
 const columns: ColumnDef<FlashcardSet>[] = [
     {
+        id: 'favorite',
+        cell: ({ row }) => {
+            //return h('div', { class: 'relative' }, h(FavoriteButton)),
+        },
+    },
+    {
         accessorKey: 'name',
         header: () => h('div', { class: 'text-right' }, 'Navn'),
         cell: ({ row }) => {
