@@ -27,8 +27,8 @@
 
             <div v-for="row, index in rows" class="row" :key="row.id">
                 <p>{{ index + 1 }}</p>
-                <Input v-model="row.question" type="Spørsmål" placeholder="Spørsmål" />
-                <Input v-model="row.answer" type="Svar" placeholder="Svar" />
+                <Input v-model="row.question" maxlength="500" type="Spørsmål" placeholder="Spørsmål" @input="limitText(row, 'question')"  />
+                <Input v-model="row.answer" maxlength="500" type="Svar" placeholder="Svar" @input="limitText(row, 'answer')" />
                 <Button @click="removeRow(index)" variant="outline">X</Button>
             </div>
             <div class="button-container">
@@ -97,7 +97,6 @@ import { useRouter } from 'vue-router';
 import type { Flashcard } from '~/classes/models';
 
 const router = useRouter();
-
 const name = ref('');
 const category = ref('');
 const isPublic = ref(false);
@@ -138,6 +137,12 @@ async function createSet() {
 
     } else {
         console.log("Ånei, noe gikk galt");
+    }
+}
+function limitText(row: Flashcard, field: 'question' | 'answer') {
+    const maxLength = 500; 
+    if (row[field].length > maxLength) {
+        row[field] = row[field].slice(0, maxLength); 
     }
 }
 </script>
