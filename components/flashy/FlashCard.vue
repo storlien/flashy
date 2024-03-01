@@ -4,10 +4,12 @@
       <Card :id="id" class="card front">
         <CardContent class="card-content" @click="flipCard">
           <CardTitle class="text">{{ question }}</CardTitle>
+          <CardTitle class="text">{{ question }}</CardTitle>
         </CardContent>
       </Card>
       <Card :id="id" class="card back">
         <CardContent class="card-content" @click="flipCard">
+          <CardTitle class="text">{{ answer }}</CardTitle>
           <CardTitle class="text">{{ answer }}</CardTitle>
         </CardContent>
       </Card>
@@ -37,7 +39,16 @@ const flipCard = () => {
   width: 1200px;
   height: 600px;
   perspective: 2000px;
+  width: 1200px;
+  height: 600px;
+  perspective: 2000px;
   cursor: pointer;
+}
+.text {
+  font-size: 28px;
+  font-weight: 600;
+  color: #000;
+  text-align: center;
 }
 .text {
   font-size: 28px;
@@ -62,11 +73,15 @@ const flipCard = () => {
   transform-origin: center;
   transform: scale(0.8);
 
+  transform-origin: center;
+  transform: scale(0.8);
+
   transition: transform 0.5s;
   transform-style: preserve-3d;
 }
 
 .card .content.flipped {
+  transform: scale(0.8) rotateX(180deg);
   transform: scale(0.8) rotateX(180deg);
 }
 
@@ -79,6 +94,7 @@ const flipCard = () => {
 }
 
 .back {
+  transform: rotateX(180deg);
   transform: rotateX(180deg);
 }
 </style>

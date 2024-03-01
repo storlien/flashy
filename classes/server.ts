@@ -2,9 +2,9 @@ import type { FirebaseApp } from 'firebase/app';
 import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
-import type { Flashcard, FlashcardSet, FlashcardSetPrefs } from '~/classes/models';
+import type { Flashcard, FlashcardSet, FlashcardSetPrefs, UserSettings } from '~/classes/models';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -27,7 +27,7 @@ class Server {
         const userId = this.auth.getUserId();
 
         if (!userId) throw new Error('Unauthorized');
-        
+
         const collectionRef = collection(db, 'flashcard-sets');
         let flashcardSets: FlashcardSet[] = [];
 
@@ -78,14 +78,14 @@ class Server {
         const userId = this.auth.getUserId();
 
         if (!userId || userId !== set.userId) throw new Error('Unauthorized');
-        
+
         try {
             await deleteDoc(doc(db, 'flashcard-sets', set.id));
 
             return true;
         } catch (e) {
             Server.logError(e);
-            
+
             return false;
         }
     }
@@ -95,7 +95,7 @@ class Server {
         const collectionRef = collection(db, 'user-set-prefs');
 
         const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
-        
+
         if (docRef.exists()) {
             return docRef.data() as FlashcardSetPrefs;
         } else {
@@ -106,7 +106,7 @@ class Server {
     /** Update user preferences for a set. */
     public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
         const collectionRef = collection(db, 'user-set-prefs');
-        
+
         await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
 
@@ -129,6 +129,70 @@ class Server {
         } catch (error) {
             Server.logError(error);
             return null;
+        }
+    }
+
+    /** Update favorite flashcard sets */
+    public async updateFavoriteSets(favoriteSets: String[]) {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            console.log('User found');
+            await updateDoc(docRef, { favoriteSets });
+            console.log('Successfully updated favorite sets');
+        } else {
+            console.log('No user found');
+            await setDoc(docRef, { favoriteSets });
+            console.log('Successfully updated favorite sets');
+        }
+    }
+
+    /** Get favorite flashcard sets */
+    public async getUserSettings(): Promise<UserSettings | null> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data() as UserSettings;
+        } 
+        
+        return null;
+    }
+
+    /** Creates empty user settings document */
+    public async createUserSettings(): Promise<UserSettings | null> {
+        const userId = this.auth.getUserId();
+        const user = this.auth.getUser();
+        // const credentials = this.auth.getCredentials();
+
+        if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return null;
+        } else {
+            const settings: UserSettings =  {
+                name: null,
+                email: user!.email,
+                favoriteSets: [],
+            };
+            await setDoc(docRef, settings);
+
+            return settings;
         }
     }
 
