@@ -1,9 +1,3 @@
-type User = {
-    id: string;
-    name: string;
-    favorites: string[];
-}
-
 type Flashcard = {
     id: string;
     question: string;
@@ -30,8 +24,16 @@ type FlashcardSetPrefs = {
     completed: string[];
 }
 
+type UserSettings = {
+    name: string | null | undefined;
+    email: string | null | undefined;
+    role? : string | null;
+    favoriteSets: string[];
+}
+
 export {
     type Flashcard,
     type FlashcardSet,
-    type FlashcardSetPrefs
+    type FlashcardSetPrefs,
+    type UserSettings,
 }
