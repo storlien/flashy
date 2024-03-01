@@ -3,9 +3,7 @@ import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
-import type { Flashcard, FlashcardSet, FlashcardSetPrefs, UserSettings } from '~/classes/models';
 import type { Flashcard, FlashcardSet, FlashcardSetPrefs, UserSettings } from '~/classes/models';
 
 const config: FirebaseOptions = {
@@ -30,7 +28,6 @@ class Server {
         const userId = this.auth.getUserId();
 
         if (!userId) throw new Error('Unauthorized');
-
 
         const collectionRef = collection(db, 'flashcard-sets');
         let flashcardSets: FlashcardSet[] = [];
@@ -83,14 +80,12 @@ class Server {
 
         if (!userId || userId !== set.userId) throw new Error('Unauthorized');
 
-
         try {
             await deleteDoc(doc(db, 'flashcard-sets', set.id));
 
             return true;
         } catch (e) {
             Server.logError(e);
-
 
             return false;
         }
@@ -102,7 +97,6 @@ class Server {
 
         const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
 
-
         if (docRef.exists()) {
             return docRef.data() as FlashcardSetPrefs;
         } else {
@@ -113,7 +107,6 @@ class Server {
     /** Update user preferences for a set. */
     public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
         const collectionRef = collection(db, 'user-set-prefs');
-
 
         await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
