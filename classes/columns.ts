@@ -2,8 +2,17 @@ import { h } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import DropdownAction from '@/components/DataTableDropDown.vue';
 import type { Flashcard, FlashcardSet } from './models';
+import FavoriteButton from '@/components/FavoriteButton.vue';
 
 const columns: ColumnDef<FlashcardSet>[] = [
+    {
+        id: 'favorite',
+        cell: ({ row }) => {
+            const set = row.original;
+
+            return h('div', { class: 'relative' }, h(FavoriteButton))
+        },
+    },
     {
         accessorKey: 'name',
         header: () => h('div', { class: 'text-right' }, 'Navn'),
@@ -44,7 +53,7 @@ const columns: ColumnDef<FlashcardSet>[] = [
         id: 'actions',
         enableHiding: false,
         cell: ({ row }) => {
-            const set = row.original
+            const set = row.original;
 
             return h('div', { class: 'relative' }, h(DropdownAction, {
                 set: set,
