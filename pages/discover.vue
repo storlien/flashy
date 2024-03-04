@@ -115,7 +115,7 @@ watch(filteredSets, () => {
 const router = useRouter();
 
 function onRowClick(index: string) {
-  const row = allSets.value[parseInt(index)];
+  const row = filteredSets.value[parseInt(index)];
   const rowId = row.id;
   router.push({ path: `/set/${rowId}`});
 }

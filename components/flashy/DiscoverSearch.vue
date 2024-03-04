@@ -60,3 +60,15 @@ const filteredCategories = computed(() => {
 });
 
 </script>
+
+TODO: Category can be a dropdown, not a tags input. 
+Instead, make the tags input search for tags
+
+Final result is all sets in that category with those tags
+
+For example:
+Programming, [Easy, Typescript]
+
+returns all Easy Typescript sets in the Programming category
+
+Category may be redundant after this, but still nice to show
