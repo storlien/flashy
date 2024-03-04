@@ -96,7 +96,7 @@ function onRowClick(index: string) {
   const row = flashcardSets.value[parseInt(index)];
   const rowId = row.id;
 
-  console.log(row.id);
+  // console.log(row.id);
 
   router.push({ path: `/set/${rowId}`});
 }
@@ -109,6 +109,6 @@ onMounted(async () => {
     userSettings.value = await server.createUserSettings();
   }
 
-  console.log(userSettings.value);
+  // console.log(userSettings.value);
 });
 </script>

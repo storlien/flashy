@@ -8,9 +8,11 @@ const columns: ColumnDef<FlashcardSet>[] = [
     {
         id: 'favorite',
         cell: ({ row }) => {
-            const set = row.original;
+            // const isFavorite = server.userSettingsCache?.favoriteSets.includes(row.original.id);
 
-            return h('div', { class: 'relative' }, h(FavoriteButton))
+            return h('div', { class: 'relative' }, h(FavoriteButton, {
+                setId: row.original.id,
+            }))
         },
     },
     {
