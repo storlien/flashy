@@ -1,6 +1,6 @@
 <template>
     <div class="favorite-button cursor-pointer ml-2" @click.stop="toggleFavorite" variant="default">
-        <img :src="HeartFilledIcon" v-if="favorite" class="heart-fill h-5 w-5 filled">
+        <img :src="HeartFilledIcon" v-if="isFavorite" class="heart-fill h-5 w-5 filled">
         <img :src="HeartIcon" v-else class="heart-outline h-5 w-5">
     </div>
 </template>
@@ -13,18 +13,32 @@
 .heart-fill {
     filter: invert(53%) sepia(80%) saturate(3587%) hue-rotate(316deg) brightness(94%) contrast(93%);
 }
-
 </style>
 
 <script setup lang="ts">
 import HeartIcon from '@/assets/icons/heart.svg';
 import HeartFilledIcon from '@/assets/icons/heart-2.svg';
+import server from '~/classes/server';
 
-const favorite = ref(false);
+const props = defineProps({
+    setId: {
+        type: String,
+        required: true,
+    }
+});
 
-function toggleFavorite() {
-    favorite.value = !favorite.value;
-    console.log(favorite.value);
+const isFavorite = computed(() => {
+    return server.userSettingsCache.favoriteSets.includes(props.setId);
+});
+
+async function toggleFavorite() {
+    const cache = server.userSettingsCache;
+    if (cache.favoriteSets.includes(props.setId)) {
+        cache.favoriteSets.splice(cache.favoriteSets.indexOf(props.setId), 1);
+        await server.updateFavoriteSets(cache.favoriteSets);
+    } else {
+        cache.favoriteSets.push(props.setId);
+        await server.updateFavoriteSets(cache.favoriteSets);
+    }
 }
-
 </script>

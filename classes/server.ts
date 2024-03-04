@@ -18,6 +18,7 @@ const db = getFirestore(app);
 
 class Server {
     public readonly auth: Authenticator;
+    public readonly userSettingsCache = reactive<UserSettings>({name: '', email: '', favoriteSets: []});
 
     constructor(app: FirebaseApp) {
         this.auth = new Authenticator(app);
@@ -143,12 +144,7 @@ class Server {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            console.log('User found');
             await updateDoc(docRef, { favoriteSets });
-            console.log('Successfully updated favorite sets');
-        } else {
-            console.log('No user found');
-            await setDoc(docRef, { favoriteSets });
             console.log('Successfully updated favorite sets');
         }
     }
@@ -164,9 +160,15 @@ class Server {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            return docSnap.data() as UserSettings;
+            const settings = docSnap.data() as UserSettings;
+            
+            this.userSettingsCache.name = settings.name;
+            this.userSettingsCache.email = settings.email;
+            this.userSettingsCache.favoriteSets = settings.favoriteSets;
+
+            return settings;
         } 
-        
+
         return null;
     }
 
@@ -191,6 +193,10 @@ class Server {
                 favoriteSets: [],
             };
             await setDoc(docRef, settings);
+
+            this.userSettingsCache.name = settings.name;
+            this.userSettingsCache.email = settings.email;
+            this.userSettingsCache.favoriteSets = settings.favoriteSets;
 
             return settings;
         }
