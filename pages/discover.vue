@@ -16,7 +16,6 @@
     </div>
 </template>
 
-
 <style>
 .center-column {
     display: flex;
@@ -49,7 +48,6 @@
 }
 
 #tagsearch {
-
     display: flex;
 
     justify-content: center;
@@ -82,6 +80,11 @@
 import DiscoverSearch from '@/components/flashy/DiscoverSearch.vue';
 import { columns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
+import server from '~/classes/server';
+
+definePageMeta({
+  middleware: 'auth',
+});
 
 const data = ref<FlashcardSet[]>([]);
 
@@ -93,5 +96,8 @@ function onRowClick(index: string) {
   router.push({ path: `/set/${rowId}`});
 }
 
+onMounted(async () => {
+  data.value = await server.getPublicFlashcardSets();
+});
 
 </script>
