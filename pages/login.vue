@@ -10,10 +10,10 @@ import LoginForm from "../components/flashy/LoginForm.vue";
       <TabsTrigger value="register">Registrer</TabsTrigger>
     </TabsList>
     <TabsContent value="register">
-      <RegisterForm></RegisterForm>
+      <RegisterForm />
     </TabsContent>
     <TabsContent value="login"> 
-      <LoginForm></LoginForm>
+      <LoginForm />
     </TabsContent>
   </Tabs>
 </template>

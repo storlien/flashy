@@ -36,12 +36,12 @@ const onSubmit = handleSubmit(async (formData) => {
 </script>
 
 <template>
+  <form @submit.prevent="onSubmit">
   <Card id="register-form">
     <CardHeader>
       <CardTitle>Registrer</CardTitle>
     </CardHeader>
     <CardContent>
-      <form @submit.prevent="onSubmit">
         <!-- <FormField v-slot="{ componentField }" name="email">
           <FormItem v-auto-animate>
             <FormControl>
@@ -66,12 +66,12 @@ const onSubmit = handleSubmit(async (formData) => {
             <FormMessage />
           </FormItem>
         </FormField>
-      </form>
-    </CardContent>
-    <CardFooter>
-      <Button type="submit" @click="onSubmit">Registrer</Button>
-    </CardFooter>
-  </Card>
+      </CardContent>
+      <CardFooter>
+        <Button type="submit">Registrer</Button>
+      </CardFooter>
+    </Card>
+  </form>
 </template>
 
 <style lang="scss" scoped>
