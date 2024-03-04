@@ -10,7 +10,7 @@
                 <div id="flashcards-header">
                     <h1>Flashcard sett</h1>
                 </div>
-                <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick" on />  
+                <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
             </div>
         </div>
     </div>
@@ -35,7 +35,6 @@
 }
 
 #discover-header {
-
     display: flex;
 
     flex-direction: row;
@@ -78,7 +77,6 @@
 
 <script setup lang="ts">
 import DiscoverSearch from '@/components/flashy/DiscoverSearch.vue';
-import { categories } from '~/classes/categories';
 import { columns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
@@ -89,6 +87,7 @@ definePageMeta({
 
 const allSets = ref<FlashcardSet[]>([]);
 const filter = reactive<string[]>([]);
+const emptyText = ref<string>('Laster...');
 
 function updateFilter(newFilter: string[]) {
   filter.length = 0;
@@ -105,6 +104,14 @@ const filteredSets = computed(() => {
   });
 });
 
+watch(filteredSets, () => {
+  if (filteredSets.value.length === 0) {
+    emptyText.value = 'Ingen resultater. Legg til flere kategorier for å utvide søket.';
+  } else {
+    emptyText.value = 'Ingen data';
+  }
+});
+
 const router = useRouter();
 
 function onRowClick(index: string) {
@@ -116,5 +123,4 @@ function onRowClick(index: string) {
 onMounted(async () => {
   allSets.value = await server.getPublicFlashcardSets();
 });
-
 </script>

@@ -18,7 +18,7 @@
             <NuxtLink to="/new-set">Nytt sett</NuxtLink>
           </Button>
         </div>
-        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" on />  
+        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="'Du har ikke laget noen sett'"/>  
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
