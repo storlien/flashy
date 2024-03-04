@@ -64,9 +64,17 @@ class Server {
             const docSnap = await getDoc(doc(db, 'flashcard-sets', id));
 
             if (docSnap.exists()) {
-                return docSnap.data() as FlashcardSet;
+                const data = docSnap.data() as FlashcardSet;
+                return {
+                    id,
+                    userId: data.userId,
+                    name: data.name,
+                    category: data.category,
+                    isPublic: data.isPublic,
+                    flashcards: data.flashcards,
+                }
             } else {
-                console.log('No such document!');
+                console.log(`No document with id ${id}`);
                 return null;
             }
         } catch (e) {
@@ -130,6 +138,26 @@ class Server {
         } catch (error) {
             Server.logError(error);
             return null;
+        }
+    }
+
+    public async updateFlashcardSet(set: FlashcardSet) {
+        if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'flashcard-sets');
+        const docRef = doc(collectionRef, set.id);
+        const docSnap = await getDoc(docRef);
+
+        const update = {
+            name: set.name,
+            userId: set.userId,
+            isPublic: set.isPublic,
+            category: set.category,
+            flashcards: set.flashcards,
+        };
+
+        if (docSnap.exists()) {
+            await updateDoc(docRef, update);
         }
     }
 

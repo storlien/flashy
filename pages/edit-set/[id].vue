@@ -6,7 +6,7 @@
                 <Button id="avbrytKnapp" variant="outline" type="submit">
                     <NuxtLink to="/profile">Avbryt</NuxtLink>
                 </Button>
-                <Button id="create-button" @click="editSet" :disabled="!canSave()">
+                <Button id="create-button" @click="saveChanges" :disabled="!canSave()">
                     Lagre Endringer
                 </Button>
             </div>
@@ -27,8 +27,8 @@
 
             <div v-for="row, index in rows" class="row" :key="row.id">
                 <p>{{ index + 1 }}</p>
-                <Input v-model="row.question" maxlength="500" type="Spørsmål" placeholder="Spørsmål" @input="limitText(row, 'question')"  />
-                <Input v-model="row.answer" maxlength="500" type="Svar" placeholder="Svar" @input="limitText(row, 'answer')" />
+                <Input v-model="row.question" maxlength="500" type="Spørsmål" placeholder="Spørsmål" />
+                <Input v-model="row.answer" maxlength="500" type="Svar" placeholder="Svar" />
                 <Button @click="removeRow(index)" variant="outline">X</Button>
             </div>
             <div class="button-container">
@@ -93,7 +93,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from '@/components/ui/checkbox'
 import server from '~/classes/server';
 import { useRouter } from 'vue-router';
-import type { Flashcard } from '~/classes/models';
+import type { Flashcard, FlashcardSet } from '~/classes/models';
 
 const router = useRouter();
 const name = ref('');
@@ -118,7 +118,7 @@ const setId = route.params.id;
 const rows = ref<Flashcard[]>([]);
 
 onMounted(() => {
-    if (rows.value.length === 0) addRow(); 
+    if (rows.value.length === 0) addRow();
 });
 
 addRow();
@@ -129,33 +129,31 @@ function addRow() {
 function removeRow(index: number) {
     rows.value.splice(index, 1);
 }
-async function editSet() {
-    console.log(name.value, category.value, isPublic.value, rows.value);
-    const set = await server.createFlashcardSet(name.value, category.value, isPublic.value, rows.value);
+async function saveChanges() {
+    if (!set) return;
 
-    if (set) {
-        console.log("Settet er lagret");
-        router.push({ name: 'profile' });
+    set.category = category.value;
+    set.name = name.value;
+    set.isPublic = isPublic.value;
+    set.flashcards = rows.value;
 
-    } else {
-        console.log("Ånei, noe gikk galt");
-    }
+    await server.updateFlashcardSet(set);
+
+    router.push({ name: 'profile' });
 }
-function limitText(row: Flashcard, field: 'question' | 'answer') {
-    const maxLength = 500; 
-    if (row[field].length > maxLength) {
-        row[field] = row[field].slice(0, maxLength); 
-    }
-}
+
+let set: FlashcardSet | null = null;
 
 async function getFlashcardSet(id: string) {
-  const set = await server.getFlashcardSet(id);
+    set = await server.getFlashcardSet(id);
 
-  if (!set) return;
-  
-  rows.value = set.flashcards;
-  name.value = set.name;
-  category.value = set.category;
+    if (!set) return;
+
+    console.log(set.id);
+
+    rows.value = set!.flashcards;
+    name.value = set.name;
+    category.value = set.category;
 }
 
 onMounted(async () => {
