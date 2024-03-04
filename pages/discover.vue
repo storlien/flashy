@@ -5,12 +5,12 @@
             <div id="discover-header">
                 <h1>Utforsk</h1>
             </div>
-            <DiscoverSearch id="tagsearch"></DiscoverSearch>
+            <DiscoverSearch id="tagsearch" @update="updateFilter"></DiscoverSearch>
             <div id="table-container">
                 <div id="flashcards-header">
                     <h1>Flashcard sett</h1>
                 </div>
-                <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />  
+                <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick" on />  
             </div>
         </div>
     </div>
@@ -78,6 +78,7 @@
 
 <script setup lang="ts">
 import DiscoverSearch from '@/components/flashy/DiscoverSearch.vue';
+import { categories } from '~/classes/categories';
 import { columns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
@@ -86,18 +87,34 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const data = ref<FlashcardSet[]>([]);
+const allSets = ref<FlashcardSet[]>([]);
+const filter = reactive<string[]>([]);
+
+function updateFilter(newFilter: string[]) {
+  filter.length = 0;
+  filter.push(...newFilter);
+}
+
+// Filter by category
+// TODO: Filter by tags
+const filteredSets = computed(() => {
+  if (filter.length === 0) return allSets.value;
+
+  return allSets.value.filter((set) => {
+    return filter.includes(set.category);
+  });
+});
 
 const router = useRouter();
 
 function onRowClick(index: string) {
-  const row = data.value[parseInt(index)];
+  const row = allSets.value[parseInt(index)];
   const rowId = row.id;
   router.push({ path: `/set/${rowId}`});
 }
 
 onMounted(async () => {
-  data.value = await server.getPublicFlashcardSets();
+  allSets.value = await server.getPublicFlashcardSets();
 });
 
 </script>
