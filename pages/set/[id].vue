@@ -118,7 +118,9 @@ async function finish() {
 
   await server.updateUserSetPrefs(prefs);
 
-  router.push({ name: 'profile' });
+  router.go(
+  -1
+  );
 }
 
 </script>
