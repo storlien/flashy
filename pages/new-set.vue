@@ -30,6 +30,10 @@
       <div v-for="(row, index) in rows" class="row" :key="row.id">
         <p>{{ index + 1 }}</p>
         <Card class="card">
+          <div>
+            <Label for="picture">Picture</Label> <!--Needs vmodel and stuff-->
+            <Input id="picture" type="file" />
+          </div>
           <CardContent class="card-content">
             <Textarea
               class="flex-1 items-center h-full text resize-none text-center center"
@@ -42,6 +46,10 @@
           </CardContent>
         </Card>
         <Card class="card">
+          <div>
+            <Label for="picture">Picture</Label> <!--Needs vmodel and stuff-->
+            <Input id="picture" type="file" />
+          </div>
           <CardContent class="card-content">
             <Textarea
               class="flex-1 items-center h-full text resize-none text-center center"
@@ -118,12 +126,15 @@
 .card {
   width: 600px;
   height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .text {
   font-size: 28px;
   font-weight: 600;
-  padding-top: 100px;
+  padding-top: 80px;
   margin-top: 25px;
   line-height: 1.5;
   height: 100%;
@@ -134,6 +145,10 @@
   justify-content: center;
   align-items: center;
   height: 100%;
+}
+
+#picture {
+  width: 100%;
 }
 </style>
 
