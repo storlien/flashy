@@ -15,7 +15,7 @@
         <div id="my-flashcards-header">
           <h1>Mine flashcards</h1>
           <Button type="submit">
-            <NuxtLink to="/new-set-new-2">Nytt sett</NuxtLink>
+            <NuxtLink to="/new-set">Nytt sett</NuxtLink>
           </Button>
         </div>
         <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" on />  
