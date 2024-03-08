@@ -6,17 +6,16 @@
             <div id="discover-header">
                 <h1>Utforsk</h1>
             </div>
-            <DiscoverSearch id="tagsearch"></DiscoverSearch>
+            <DiscoverSearch id="tagsearch" @update="updateFilter"></DiscoverSearch>
             <div id="table-container">
                 <div id="flashcards-header">
                     <h1>Flashcard sett</h1>
                 </div>
-                <DataTable id="table" :columns="columns" :data="data" :on-row-click="onRowClick" on />  
+                <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
             </div>
         </div>
     </div>
 </template>
-
 
 <style>
 .center-column {
@@ -37,7 +36,6 @@
 }
 
 #discover-header {
-
     display: flex;
 
     flex-direction: row;
@@ -50,7 +48,6 @@
 }
 
 #tagsearch {
-
     display: flex;
 
     justify-content: center;
@@ -83,16 +80,48 @@
 import DiscoverSearch from '@/components/flashy/DiscoverSearch.vue';
 import { columns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
+import server from '~/classes/server';
 
-const data = ref<FlashcardSet[]>([]);
+definePageMeta({
+  middleware: 'auth',
+});
+
+const allSets = ref<FlashcardSet[]>([]);
+const filter = reactive<string[]>([]);
+const emptyText = ref<string>('Laster...');
+
+function updateFilter(newFilter: string[]) {
+  filter.length = 0;
+  filter.push(...newFilter);
+}
+
+// Filter by category
+// TODO: Filter by tags
+const filteredSets = computed(() => {
+  if (filter.length === 0) return allSets.value;
+
+  return allSets.value.filter((set) => {
+    return filter.includes(set.category);
+  });
+});
+
+watch(filteredSets, () => {
+  if (filteredSets.value.length === 0) {
+    emptyText.value = 'Ingen resultater. Legg til flere kategorier for å utvide søket.';
+  } else {
+    emptyText.value = 'Ingen data';
+  }
+});
 
 const router = useRouter();
 
 function onRowClick(index: string) {
-  const row = data.value[parseInt(index)];
+  const row = filteredSets.value[parseInt(index)];
   const rowId = row.id;
   router.push({ path: `/set/${rowId}`});
 }
 
-
+onMounted(async () => {
+  allSets.value = await server.getPublicFlashcardSets();
+});
 </script>

@@ -24,6 +24,7 @@ class Server {
         this.auth = new Authenticator(app);
     }
 
+    // TODO: Can refactor this to return public flashcard sets, but filter out sets that are not yours
     public async getUserFlashcardSets(): Promise<FlashcardSet[]> {
         const userId = this.auth.getUserId();
 
@@ -50,6 +51,40 @@ class Server {
             });
 
             console.log(flashcardSets);
+
+            return flashcardSets;
+
+        } catch (e) {
+            Server.logError(e);
+            return flashcardSets;
+        }
+    }
+
+    /** Get public sets including your own (possibly private) sets. */
+    public async getPublicFlashcardSets(): Promise<FlashcardSet[]> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'flashcard-sets');
+        let flashcardSets: FlashcardSet[] = [];
+
+        try {
+            const snapshot = await getDocs(collectionRef);
+
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return flashcardSets;
+            }
+
+            snapshot.forEach(doc => {
+                const flashcardSet = doc.data() as FlashcardSet;
+                flashcardSet.id = doc.id;
+
+                if (flashcardSet.isPublic || flashcardSet.userId === userId) {
+                    flashcardSets.push(flashcardSet);
+                }
+            });
 
             return flashcardSets;
 
