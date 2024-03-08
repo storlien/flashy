@@ -109,6 +109,6 @@ onMounted(async () => {
     userSettings.value = await server.createUserSettings();
   }
 
-  console.log(userSettings.value);
+  // console.log(userSettings.value);
 });
 </script>

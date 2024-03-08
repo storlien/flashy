@@ -29,7 +29,6 @@ class Server {
 
         if (!userId) throw new Error('Unauthorized');
 
-
         const collectionRef = collection(db, 'flashcard-sets');
         let flashcardSets: FlashcardSet[] = [];
 
@@ -65,9 +64,17 @@ class Server {
             const docSnap = await getDoc(doc(db, 'flashcard-sets', id));
 
             if (docSnap.exists()) {
-                return docSnap.data() as FlashcardSet;
+                const data = docSnap.data() as FlashcardSet;
+                return {
+                    id,
+                    userId: data.userId,
+                    name: data.name,
+                    category: data.category,
+                    isPublic: data.isPublic,
+                    flashcards: data.flashcards,
+                }
             } else {
-                console.log('No such document!');
+                console.log(`No document with id ${id}`);
                 return null;
             }
         } catch (e) {
@@ -81,14 +88,12 @@ class Server {
 
         if (!userId || userId !== set.userId) throw new Error('Unauthorized');
 
-
         try {
             await deleteDoc(doc(db, 'flashcard-sets', set.id));
 
             return true;
         } catch (e) {
             Server.logError(e);
-
 
             return false;
         }
@@ -100,7 +105,6 @@ class Server {
 
         const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
 
-
         if (docRef.exists()) {
             return docRef.data() as FlashcardSetPrefs;
         } else {
@@ -111,7 +115,6 @@ class Server {
     /** Update user preferences for a set. */
     public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
         const collectionRef = collection(db, 'user-set-prefs');
-
 
         await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
@@ -138,6 +141,26 @@ class Server {
         }
     }
 
+    public async updateFlashcardSet(set: FlashcardSet) {
+        if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'flashcard-sets');
+        const docRef = doc(collectionRef, set.id);
+        const docSnap = await getDoc(docRef);
+
+        const update = {
+            name: set.name,
+            userId: set.userId,
+            isPublic: set.isPublic,
+            category: set.category,
+            flashcards: set.flashcards,
+        };
+
+        if (docSnap.exists()) {
+            await updateDoc(docRef, update);
+        }
+    }
+
     /** Update favorite flashcard sets */
     public async updateFavoriteSets(favoriteSets: String[]) {
         const userId = this.auth.getUserId();
@@ -149,12 +172,7 @@ class Server {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            console.log('User found');
             await updateDoc(docRef, { favoriteSets });
-            console.log('Successfully updated favorite sets');
-        } else {
-            console.log('No user found');
-            await setDoc(docRef, { favoriteSets });
             console.log('Successfully updated favorite sets');
         }
     }
@@ -170,9 +188,15 @@ class Server {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            return docSnap.data() as UserSettings;
+            const settings = docSnap.data() as UserSettings;
+            
+            this.userSettingsCache.name = settings.name;
+            this.userSettingsCache.email = settings.email;
+            this.userSettingsCache.favoriteSets = settings.favoriteSets;
+
+            return settings;
         } 
-        
+
         return null;
     }
 
@@ -197,6 +221,10 @@ class Server {
                 favoriteSets: [],
             };
             await setDoc(docRef, settings);
+
+            this.userSettingsCache.name = settings.name;
+            this.userSettingsCache.email = settings.email;
+            this.userSettingsCache.favoriteSets = settings.favoriteSets;
 
             return settings;
         }
