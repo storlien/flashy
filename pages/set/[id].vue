@@ -4,6 +4,7 @@ import { watchOnce } from "@vueuse/core";
 import type { Flashcard, FlashcardSet, FlashcardSetPrefs } from "~/classes/models";
 import server from "~/classes/server";
 import type { Carousel, CarouselApi } from "~/components/ui/carousel";
+import { Progress as ProgressBar} from "~/components/ui/progress";
 
 definePageMeta({
   middleware: 'auth',
@@ -17,7 +18,7 @@ const flashCards = ref<Flashcard[]>([]);
 const difficultCards = ref<Set<string>>(new Set());
 
 const api = ref<CarouselApi>();
-const totalCount = ref(0);
+const totalCount = ref<number | undefined>();
 const index = ref(0);
 
 const router = useRouter();
@@ -29,11 +30,11 @@ function setApi(val: CarouselApi) {
 watchOnce(api, (api) => {
   if (!api) return;
 
-  totalCount.value = api.scrollSnapList().length;
   index.value = api.selectedScrollSnap();
 
   api.on('select', () => {
     index.value = api.selectedScrollSnap();
+    totalCount.value = api.scrollSnapList().length;
   });
 });
 
@@ -41,8 +42,6 @@ async function getFlashcardSet(id: string) {
   const set = await server.getFlashcardSet(id);
 
   if (!set) return;
-
-  console.log(set.id);
 
   flashCards.value = set.flashcards;
   flashcardSet.value = set;
@@ -120,14 +119,24 @@ async function finish() {
 
   await server.updateUserSetPrefs(prefs);
 
-  router.push({ name: 'profile' });
+  router.go(
+  -1
+  );
 }
+
+const progress = computed(() => {
+  if (!totalCount.value) return 0;
+  console.log("total count", totalCount.value);
+  return index.value  / (totalCount.value-1) * 100;
+});
+
 
 </script>
 
 <template>
   <div id="setPageContainer">
     <div id="carousel-container" class="flex items-center justify-center">
+      <ProgressBar :max="100" v-model="progress" class="w-3/5"></ProgressBar>
       <Carousel @init-api="setApi" class="relative w-full max-w-2xl">
         <CarouselContent class="content">
           <CarouselItem class="carousel-item" v-for="card in flashCards" :key="card.id">
@@ -144,12 +153,15 @@ async function finish() {
       </label>
     </div>
     <Button class="mb-9" @click="finish">Fullfør</Button>
+    
   </div>
 
   <!-- Exit button -->
 </template>
 
 <style scoped>
+
+
 .content {
   overflow: visible;
 }

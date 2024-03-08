@@ -1,4 +1,5 @@
 <template>
+    <NavBar></NavBar>
     <div id="discover">
         <div></div>
         <div class="center-column">
