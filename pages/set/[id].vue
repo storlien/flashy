@@ -121,7 +121,9 @@ async function finish() {
 
   await server.updateUserSetPrefs(prefs);
 
-  router.push({ name: 'profile' });
+  router.go(
+  -1
+  );
 }
 
 const progress = computed(() => {

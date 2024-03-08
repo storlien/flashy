@@ -34,8 +34,8 @@ const flipCard = () => {
 
 <style scoped>
 .card {
-  width: 1200px;
-  height: 600px;
+  width: 600px;
+  height: 400px;
   perspective: 2000px;
   width: 1200px;
   height: 600px;
