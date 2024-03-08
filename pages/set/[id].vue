@@ -43,8 +43,6 @@ async function getFlashcardSet(id: string) {
 
   if (!set) return;
 
-  console.log(set.id);
-
   flashCards.value = set.flashcards;
   flashcardSet.value = set;
 }

@@ -1,16 +1,21 @@
 <template>
+  <NavBar/>
   <div id="profile">
     <div></div>
     <div id="center-column">
+
+
       <div id="profile-left">
         <Button id="logout-button">
           <NuxtLink to="/login">Logg ut</NuxtLink>
         </Button>
         <ManageProfile id="editprofile"></ManageProfile>
       </div>
-      
+
+
+
       <div class="space" :style="{ height: '10vh' }"></div>
-      
+
       <div id="table-container">
         <div id="my-flashcards-header">
           <h1>Mine flashcards</h1>
@@ -18,7 +23,7 @@
             <NuxtLink to="/new-set">Nytt sett</NuxtLink>
           </Button>
         </div>
-        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" on />  
+        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" on />
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
@@ -27,7 +32,6 @@
 </template>
 
 <style lang="scss">
-
 #profile-left {
   display: grid;
   grid-auto-columns: min-content;
@@ -68,7 +72,7 @@
   }
 }
 </style>
-  
+
 <script setup lang="ts">
 import type { FlashcardSet, UserSettings } from '~/classes/models';
 import { columns } from '~/classes/columns';
@@ -100,7 +104,7 @@ function onRowClick(index: string) {
 
   // console.log(row.id);
 
-  router.push({ path: `/set/${rowId}`});
+  router.push({ path: `/set/${rowId}` });
 }
 
 onMounted(async () => {

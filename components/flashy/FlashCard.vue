@@ -4,10 +4,12 @@
       <Card :id="id" class="card front">
         <CardContent class="card-content" @click="flipCard">
           <CardTitle class="text">{{ question }}</CardTitle>
+          <CardTitle class="text">{{ question }}</CardTitle>
         </CardContent>
       </Card>
       <Card :id="id" class="card back">
         <CardContent class="card-content" @click="flipCard">
+          <CardTitle class="text">{{ answer }}</CardTitle>
           <CardTitle class="text">{{ answer }}</CardTitle>
         </CardContent>
       </Card>
