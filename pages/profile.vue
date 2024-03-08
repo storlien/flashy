@@ -94,20 +94,6 @@ const userSettings = ref<UserSettings | null>();
 const router = useRouter();
 
 
-watch(server.userSettingsCache, () => {
-
-    flashcardSets.value.sort((a, b) => {
-      const isInFavoriteSetsA = userSettings.value?.favoriteSets.includes(a.id) ? -1 : 1;
-      const isInFavoriteSetsB = userSettings.value?.favoriteSets.includes(b.id) ? -1 : 1;
-
-      return (isInFavoriteSetsA - isInFavoriteSetsB);
-
-    });
-    flashcardSets.value = [...flashcardSets.value];
-});
-
-
-
 function onRowClick(index: string) {
   const row = flashcardSets.value[parseInt(index)];
   const rowId = row.id;
@@ -118,12 +104,29 @@ function onRowClick(index: string) {
 }
 
 onMounted(async () => {
-  flashcardSets.value = await server.getUserFlashcardSets();
+
+  const flashcardSet = ref<FlashcardSet[]>([]);
+  
   userSettings.value = await server.getUserSettings();
 
   if (!userSettings.value) {
     userSettings.value = await server.createUserSettings();
   }
+
+  flashcardSet.value = await server.getUserFlashcardSets();
+
+  flashcardSet.value.sort((a, b) => {
+      const isInFavoriteSetsA = userSettings.value?.favoriteSets.includes(a.id) ? -1 : 1;
+      const isInFavoriteSetsB = userSettings.value?.favoriteSets.includes(b.id) ? -1 : 1;
+
+      return (isInFavoriteSetsA - isInFavoriteSetsB);
+
+  });
+
+  flashcardSet.value = [...flashcardSet.value];
+  
+
+  flashcardSets.value = flashcardSet.value;
 
   // console.log(userSettings.value);
 });
