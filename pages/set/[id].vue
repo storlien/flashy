@@ -174,7 +174,7 @@ onMounted(async () => {
         Her kan du øve deg på flashcards. Klikk på kortene for å se svaret. Klikk igjen for å gå til neste kort.
         <br>
         <br>
-        For å markere et kort som vanskelig, trykk på det sure fjeset. Kortet vil da dukke opp igjen på 
+        For å markere et kort som vanskelig, trykk på det sure fjeset. Kortet vil dukke opp igjen på 
         slutten slik at du kan prøve deg på nytt.
       </DialogDescription>
       <DialogClose as-child>
