@@ -2,12 +2,16 @@ import { h } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import DropdownAction from '@/components/DataTableDropDown.vue';
 import type { Flashcard, FlashcardSet } from './models';
+import FavoriteButton from '@/components/FavoriteButton.vue';
 
 const columns: ColumnDef<FlashcardSet>[] = [
     {
         id: 'favorite',
         cell: ({ row }) => {
             //return h('div', { class: 'relative' }, h(FavoriteButton)),
+            return h('div', { class: 'relative' }, h(FavoriteButton, {
+                setId: row.original.id,
+            }))
         },
     },
     {

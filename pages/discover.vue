@@ -1,57 +1,120 @@
 <template>
-    <NavBar></NavBar>
-    <div id="discover">
-        <div></div>
-        <div class="center-column">
-            <div id="discover-header">
-                <h1>Utforsk</h1>
-            </div>
-            <DiscoverSearch id="tagsearch" @update="updateFilter"></DiscoverSearch>
-            <div id="table-container">
-                <div id="flashcards-header">
-                    <h1>Flashcard sett</h1>
-                </div>
-                <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
-            </div>
+  <NavBar></NavBar>
+  <div id="discover">
+    <div></div>
+    <div class="center-column">
+      <div id="discover-header">
+        <h1>Utforsk</h1>
+      </div>
+      <DiscoverSearch id="tagsearch" @update="updateFilter"></DiscoverSearch>
+      <div id="table-container">
+        <div id="flashcards-header">
+          <h1>Flashcard sett</h1>
         </div>
+        <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick"
+          :empty-text="emptyText" />
+      </div>
+      <div class="comments-container">
+      <h2 class="titleComments">Kommentarer</h2>
+      <div class="comments">
+        <div v-for="comment in comments">
+          <div class="comment">
+            <h3>{{ comment.userId }}</h3>
+            <p>{{ comment.text }}</p>
+          </div>
+        </div>
+        <!-- Likes går her-->
+      </div>
+      <div className="kommentarboks">
+        <Textarea placeholder="Skriv en kommentar her" v-model="comment"></Textarea>
+        <Button :disabled="!comment" id="AddCommentButton" @click="createComment"> Legg til kommentar</Button>
+      </div>
+    </div> 
     </div>
+  </div>
 </template>
 
-<style>
+<style lang="scss">
+
+#AddCommentButton {
+  margin-top: 20px;
+}
+
+.kommentarboks{
+  margin-top: 20px;
+}
+
+.titleComments{
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.comments-container{
+  padding: 20px;
+  margin-bottom: 40px;
+}
+
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: start;
+
+  .comment {
+    width: 100%;
+    border: 2px solid #f0f0f0;
+    // margin: 0 20px;
+    padding: 20px;
+
+    h3 {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 12px;
+    }
+
+
+    border-radius: 10px;
+  }
+}
+
+
 .center-column {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
-    row-gap: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  row-gap: 20px;
 }
 
 #discover {
-    position: relative;
-    display: grid;
+  position: relative;
+  display: grid;
 
-    height: 100vh;
-    width: 100vw;
-    grid-template-columns: 1fr 2fr 1fr;
+  height: 100vh;
+  width: 100vw;
+  grid-template-columns: 1fr 2fr 1fr;
 }
 
 #discover-header {
-    display: flex;
+  display: flex;
 
-    flex-direction: row;
-    justify-content: center;
-    align-items: start;
+  flex-direction: row;
+  justify-content: center;
+  align-items: start;
 
-    padding: 20px;
+  padding: 20px;
 
-    font-size: 2em;
+  font-size: 2em;
 }
 
 #tagsearch {
-    display: flex;
+  display: flex;
 
-    justify-content: center;
-    align-items: center;
+  justify-content: center;
+  align-items: center;
 }
 
 #table-container {
@@ -65,14 +128,23 @@
 }
 
 #flashcards-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 #table {
-    width: 100%;
+  width: 100%;
+}
+
+#comments {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  border: 1px solid #f0f0f0;
+  border-radius: 5px;
+  padding: 20px;
+
 }
 </style>
 
@@ -81,6 +153,24 @@ import DiscoverSearch from '@/components/flashy/DiscoverSearch.vue';
 import { columns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
+
+type Comment = {
+  userId: string,
+  text: string,
+}
+
+const comments = ref<Comment[]>([
+  {
+    userId: '65636etfgdf',
+    text: 'Flashy er kult',
+  },
+  {
+    userId: '564fgf4thr',
+    text: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. A neque, sapiente ipsam odit delectus facere architecto. Explicabo inventore, ipsum in, perspiciatis eaque doloremque officia quo itaque impedit porro magni nulla?',
+  },
+])
+
+const comment = ref("")
 
 definePageMeta({
   middleware: 'auth',
@@ -118,7 +208,13 @@ const router = useRouter();
 function onRowClick(index: string) {
   const row = filteredSets.value[parseInt(index)];
   const rowId = row.id;
-  router.push({ path: `/set/${rowId}`});
+  router.push({ path: `/set/${rowId}` });
+}
+
+function createComment() {
+  comments.value.push({userId: "silje", text: comment.value})
+  comment.value = ""
+
 }
 
 onMounted(async () => {

@@ -1,7 +1,7 @@
 <template>
     <div class="favorite-button cursor-pointer ml-2" @click.stop="toggleFavorite" variant="default">
-        <img :src="HeartFilledIcon" v-if="isFavorite" class="heart-fill h-5 w-5 filled">
-        <img :src="HeartIcon" v-else class="heart-outline h-5 w-5">
+        <img :src="StarFilledIcon" v-if="isFavorite" class="heart-fill h-5 w-5 filled">
+        <img :src="StarIcon" v-else class="heart-outline h-5 w-5">
     </div>
 </template>
 
@@ -16,8 +16,8 @@
 </style>
 
 <script setup lang="ts">
-import HeartIcon from '@/assets/icons/heart.svg';
-import HeartFilledIcon from '@/assets/icons/heart-2.svg';
+import StarIcon from '@/assets/icons/star.svg';
+import StarFilledIcon from '@/assets/icons/starfilled.svg';
 import server from '~/classes/server';
 
 const props = defineProps({
