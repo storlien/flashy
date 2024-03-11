@@ -43,7 +43,6 @@ function shuffleCards(flashcards: Flashcard[], difficultCards: Set<string>) {
   cards.value = shuffledFlashcards;
 }
 
-
 function reveal(card: string) {
   if (revealed.value === card) {
     discardClass.value = 'success';
@@ -159,7 +158,7 @@ onMounted(async () => {
     </div>
   </div>
   <div v-if="stack.length" class="buttons">
-    <button class="fail" @click="hard">
+    <button @click="hard">
       <AngryIcon color="#dd1d4a" class="w-10 h-10"></AngryIcon>
     </button>
   </div>
@@ -175,12 +174,12 @@ onMounted(async () => {
         Her kan du øve deg på flashcards. Klikk på kortene for å se svaret. Klikk igjen for å gå til neste kort.
         <br>
         <br>
-        For å markere et kort som vanskelig, trykk på det sure fjeset. Kortet vil da dukke opp igjen på slutten slik at
-        du kan prøve deg på nytt.
+        For å markere et kort som vanskelig, trykk på det sure fjeset. Kortet vil da dukke opp igjen på 
+        slutten slik at du kan prøve deg på nytt.
       </DialogDescription>
-      <DialogFooter>
+      <DialogClose as-child>
         <Button type="submit">Skjønner!</Button>
-      </DialogFooter>
+      </DialogClose>
     </DialogContent>
   </Dialog>
 </template>
