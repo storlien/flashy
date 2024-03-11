@@ -123,8 +123,31 @@ onMounted(async () => {
 </script>
 
 <template>
-  <NavBar class="fixed z-10"></NavBar>
-  <ProgressBar id="progress" v-model="progress"></ProgressBar>
+  <NavBar></NavBar>
+  <div v-if="cardSet" class="header">
+    <Dialog>
+      <DialogTrigger as-child>
+        <HelpCircleIcon color="#c0c0c0" class="w-8 h-8"></HelpCircleIcon>
+      </DialogTrigger>
+      <DialogContent class="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Velkommen til Flashy!</DialogTitle>
+        </DialogHeader>
+        <DialogDescription>
+          Her kan du øve deg på flashcards. Klikk på kortene for å se svaret. Klikk igjen for å gå til neste kort.
+          <br>
+          <br>
+          For å markere et kort som vanskelig, trykk på det sure fjeset. Kortet vil dukke opp igjen på
+          slutten slik at du kan prøve deg på nytt.
+        </DialogDescription>
+        <DialogClose as-child>
+          <Button type="submit">Skjønner!</Button>
+        </DialogClose>
+      </DialogContent>
+    </Dialog>
+    <h1> {{ cardSet.name }}</h1>
+    <ProgressBar id="progress" v-model="progress"></ProgressBar>
+  </div>
   <div v-if="cards" class="set-page">
     <div v-if="stack.length" class="stack" @click="reveal(stack[stack.length - 1].id)">
       <div v-for="(card, i) in stack" class="pair" :key="card.id" :style="{
@@ -162,61 +185,42 @@ onMounted(async () => {
       <AngryIcon color="#dd1d4a" class="w-10 h-10"></AngryIcon>
     </button>
   </div>
-  <Dialog>
-    <DialogTrigger as-child>
-      <HelpCircleIcon color="#c0c0c0" class="w-10 h-10 fixed left-5 top-20"></HelpCircleIcon>
-    </DialogTrigger>
-    <DialogContent class="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle>Velkommen til Flashy!</DialogTitle>
-      </DialogHeader>
-      <DialogDescription>
-        Her kan du øve deg på flashcards. Klikk på kortene for å se svaret. Klikk igjen for å gå til neste kort.
-        <br>
-        <br>
-        For å markere et kort som vanskelig, trykk på det sure fjeset. Kortet vil dukke opp igjen på 
-        slutten slik at du kan prøve deg på nytt.
-      </DialogDescription>
-      <DialogClose as-child>
-        <Button type="submit">Skjønner!</Button>
-      </DialogClose>
-    </DialogContent>
-  </Dialog>
 </template>
 
 <style lang="scss">
-#progress {
-  width: 30vw;
-  position: fixed;
+.header {
+  width: 100vw;
 
-  left: 35vw;
   top: 10vh;
+  padding: 5vh 2vw;
+
+  display: grid;
+  align-items: center;
+  gap: 20px;
+  grid-template-columns: 2rem 2fr 2fr 2fr 2rem;
 }
 
 .buttons {
-  position: absolute;
-
-  bottom: 10vh;
-
+  position: relative;
+  margin-top: 8vh;
+  
   display: flex;
   gap: 40px;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: 100vw;
 }
 
 .set-page {
-  position: fixed;
-
-  top: 0;
-
-  margin: 0;
+  position: relative;
+  margin: 4vh 0;  
   width: 100vw;
-  height: 100vh;
 
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .stack,
