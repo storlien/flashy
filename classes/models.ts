@@ -27,8 +27,14 @@ type FlashcardSetPrefs = {
 type UserSettings = {
     name: string | null | undefined;
     email: string | null | undefined;
-    role? : string | null;
+    role?: string | null;
     favoriteSets: string[];
+}
+
+type ImageMetadata = {
+    customMetadata: {
+        userId: string;
+    }
 }
 
 export {
@@ -36,4 +42,5 @@ export {
     type FlashcardSet,
     type FlashcardSetPrefs,
     type UserSettings,
+    type ImageMetadata,
 }
