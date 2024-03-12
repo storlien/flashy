@@ -18,88 +18,63 @@
           <DialogTitle>Profil</DialogTitle>
         </DialogHeader>
 
-        <form @submit.prevent="onSubmit" class="grid gap-4 py-4">
-            <div class="relative flex justify-center align-center pb-5">
-              <Label for="picture">
-                <Avatar class="h-[160px] w-[160px] cursor-pointer">
-                  <AvatarImage src="" alt="User avatar" class="w-full h-full" />
-                  <AvatarFallback class="text-xl">
-                    <span>{{
-                      userSettings?.name
-                        ? userSettings.name.charAt(0)
-                        : "Bruker"
-                    }}</span>
-                  </AvatarFallback>
-                </Avatar>
-                <div
-                  class="absolute right-[115px] bottom-[25px] z-10 rounded-full overflow-hidden bg-[#dd1d4a] h-[35px]"
-                >
-                  <Pencil
-                    color="white"
-                    class="w-[35px] h-[35px] p-[10px] cursor-pointer"
-                  ></Pencil>
-                </div>
-              </Label>
-              <!--Needs vmodel and stuff -->
-              <Input id="picture" type="file" style="display: none" />
-            </div>
-            <FormField v-slot="{ componentField }" name="username">
-              <FormControl>
-                <div class="grid grid-cols-4 items-center gap-4">
-                  <Label for="username" class="text-right">Brukernavn</Label>
-                  <Input
-                    class="col-span-3"
-                    type="text"
-                    id="username"
-                    v-bind="componentField"
-                    v-model="username"
-                  />
-                </div>
-              </FormControl>
-            </FormField>
+        <form @submit="onSubmit" class="grid gap-4 py-4">
+          <div class="relative flex justify-center">
+            <Label for="picture">
+              <Avatar class="h-[160px] w-[160px] cursor-pointer">
+                <AvatarImage src="" alt="User avatar" class="w-full h-full" />
+                <AvatarFallback class="text-xl">
+                  <span>{{
+              userSettings?.name
+                ? userSettings.name.charAt(0)
+                : "Bruker"
+            }}</span>
+                </AvatarFallback>
+              </Avatar>
+              <div class="absolute right-[115px] bottom-[10px] z-10 rounded-full overflow-hidden bg-[#dd1d4a] h-[35px]">
+                <Pencil color="white" class="w-[35px] h-[35px] p-[10px] cursor-pointer"></Pencil>
+              </div>
+            </Label>
+            <!--Needs vmodel and stuff -->
+            <Input id="picture" type="file" style="display: none" />
+          </div>
 
-            <FormField v-slot="{ componentField }" name="email">
-              <FormItem v-auto-animate>
-                <FormControl>
-                  <div class="grid grid-cols-4 items-center gap-4">
-                    <Label for="email" class="text-right">E-post</Label>
-                    <Input
-                      type="email"
-                      id="email"
-                      class="col-span-3"
-                      v-bind="componentField"
-                      v-model="email"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-            <FormField v-slot="{ componentField }" name="password">
-              <FormItem v-auto-animate>
-                <FormControl>
-                  <div class="grid grid-cols-4 items-center gap-4">
-                    <Label for="password" class="text-right">Passord</Label>
-                    <Input
-                      type="password"
-                      id="password"
-                      class="col-span-3"
-                      v-bind="componentField"
-                      placeholder="Skriv her"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-            <div class="h-8"></div>
-            <DialogFooter>
-              <Button id="logout-button" variant="outline" class="absolute left-6">
-                <NuxtLink to="/login">Logg ut</NuxtLink>
-              </Button>
-              <Button type="submit">Lagre</Button>
-            </DialogFooter>
-        </form>
+          <FormField v-slot="{ componentField }" name="username">
+            <FormItem>
+              <FormLabel>Brukernavn</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Oppdater brukernavn" v-bind="componentField" v-model="username" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="email">
+            <FormItem>
+              <FormLabel>E-post</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="Oppdater e-post" v-bind="componentField" v-model="email" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="password">
+            <FormItem>
+              <FormLabel>Passord</FormLabel>
+              <FormControl>
+                <Input type="password" v-bind="componentField" placeholder="Oppdater passord" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <div class="h-4"></div>
+          <DialogFooter class="w-full flex flex-row justify-between">
+            <Button id="logout-button" variant="outline">
+              <NuxtLink to="/login">Logg ut</NuxtLink>
+            </Button>
+            <Button type="submit">Lagre</Button>
+          </DialogFooter>
+        </Form>
       </DialogContent>
     </Dialog>
   </div>
@@ -108,7 +83,6 @@
 <script setup lang="ts">
 import type { UserSettings } from "~/classes/models";
 import { Pencil } from "lucide-vue-next";
-import { vAutoAnimate } from "@formkit/auto-animate/vue";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { useRouter } from "vue-router";
@@ -119,16 +93,16 @@ const userSettings = ref<UserSettings | null>();
 
 const username = ref("User");
 const email = ref("Not found");
-const password = ref("********");
+// const password = ref("********");
 
 onMounted(async () => {
-  userSettings.value = await server.getUserSettings();
+  userSettings.value = server.userSettingsCache;
 
   if (!userSettings.value) {
-    userSettings.value = await server.createUserSettings();
+    userSettings.value = await server.getUserSettings();
   }
 
-  username.value = userSettings.value?.name || "Bruker";
+  username.value = userSettings.value?.name ?? '';
   email.value = userSettings.value?.email || "Ikke funnet";
 });
 
@@ -136,26 +110,38 @@ const router = useRouter();
 
 const formSchema = toTypedSchema(
   z.object({
-    username: z.string().min(2, "Username must be at least 2 characters"),
-    email: z.string().email("Must be a valid email"),
+    username: z.
+      string({ required_error: 'Obligatorisk' })
+      .min(2, "Må ha minst 2 tegn")
+      .max(25, "Kan ikke ha mer enn 25 tegn"),
+    email: z
+      .string({ required_error: 'Obligatorisk' })
+      .email("Ugyldig e-postadresse"),
     password: z
       .string()
-      .min(6, "Password must be at least 6 characters")
-      .max(25, "Password must be less than 25 characters")
-      .regex(/.*[0-9].*/, "Password must contain at least one number"),
+      .min(6, "Må ha minst 6 tegn")
+      .max(25, "Kan ikke ha mer enn 25 tegn")
+      .regex(/.*[0-9].*/, "Må inneholde minst ett nummer")
+      .optional(),
   })
 );
 
-const { handleSubmit } = useForm({
+const form = useForm({
   validationSchema: formSchema,
 });
 
-const onSubmit = handleSubmit(async (formData) => {
+const onSubmit = form.handleSubmit(async (formData) => {
   console.log(formData);
   await server.updateUserName(formData.username);
-  await server.updateUserEmail(formData.email);
-  await server.updateUserPassword(formData.password);
-  console.log("Submit");
+
+  if (formData.email && formData.email.length > 0) {
+    await server.updateUserEmail(formData.email);
+  }
+
+  if (formData.password) {
+    await server.updateUserPassword(formData.password);
+  }
+
   router.push({ name: "profile" });
 });
 </script>

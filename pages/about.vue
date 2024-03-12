@@ -79,3 +79,11 @@
   margin-right: 50px;
 }
 </style>
+
+<script setup lang="ts"> 
+
+definePageMeta({
+  middleware: 'auth',
+});
+
+</script>
