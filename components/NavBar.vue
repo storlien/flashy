@@ -6,7 +6,7 @@
         Om Flashy
       </RouterLink>
       <RouterLink to="/profile" :class="{ 'selected': $route.path === '/profile' }" class="centered-text">
-        Profil
+        Min Side
       </RouterLink>
       <RouterLink to="/discover" :class="{ 'selected': $route.path === '/discover' }" class="centered-text">
         Utforsk
