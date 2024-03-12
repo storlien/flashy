@@ -3,17 +3,6 @@
   <div id="profile">
     <div></div>
     <div id="center-column">
-
-
-      <div id="profile-left">
-        <Button id="logout-button">
-          <NuxtLink to="/login">Logg ut</NuxtLink>
-        </Button>
-        <ManageProfile id="editprofile"></ManageProfile>
-      </div>
-
-
-
       <div class="space" :style="{ height: '10vh' }"></div>
 
       <div id="table-container">
@@ -32,15 +21,6 @@
 </template>
 
 <style lang="scss">
-#profile-left {
-  display: grid;
-  grid-auto-columns: min-content;
-  grid-auto-flow: column;
-  row-gap: 10px;
-  column-gap: 10px;
-  justify-items: start;
-  align-items: start;
-}
 
 #profile {
   display: grid;
