@@ -3,8 +3,8 @@
     <div></div>
     <div id="center-column">
       <div id="header-buttons">
-        <Button id="avbrytKnapp" variant="outline" type="submit">
-          <NuxtLink to="./profile">Avbryt</NuxtLink>
+        <Button id="avbrytKnapp" variant="outline" @click="$router.push('/profile')">
+          Avbryt
         </Button>
         <Button id="create-button" @click="createSet" :disabled="!canSave()">
           Lagre

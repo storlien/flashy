@@ -6,8 +6,8 @@
 
 
       <div id="profile-left">
-        <Button id="logout-button">
-          <NuxtLink to="/login">Logg ut</NuxtLink>
+        <Button id="logout-button" @click="logout">
+          Logg ut
         </Button>
         <ManageProfile id="editprofile"></ManageProfile>
       </div>
@@ -19,11 +19,11 @@
       <div id="table-container">
         <div id="my-flashcards-header">
           <h1>Mine flashcards</h1>
-          <Button type="submit">
-            <NuxtLink to="/new-set">Nytt sett</NuxtLink>
+          <Button type="submit" @click="$router.push('/new-set')">
+            Nytt sett
           </Button>
         </div>
-        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="'Du har ikke laget noen sett'"/>  
+        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
@@ -32,6 +32,12 @@
 </template>
 
 <style lang="scss">
+
+#center-column {
+  border: 2px solid #f0f0f0;
+  padding: 20px 50px;
+}
+
 #profile-left {
   display: grid;
   grid-auto-columns: min-content;
@@ -81,6 +87,12 @@ import ManageProfile from '@/components/flashy/ManageProfile.vue';
 import { ref, watch } from 'vue'
 
 
+
+async function logout() {
+  router.push('/login');
+  await server.auth.logout();
+}
+
 defineComponent({
   components: {
     ManageProfile,
@@ -94,7 +106,7 @@ definePageMeta({
 
 const flashcardSets = ref<FlashcardSet[]>([]);
 const userSettings = ref<UserSettings | null>();
-
+const emptyText = ref<string>('Laster...');
 const router = useRouter();
 
 
@@ -106,6 +118,10 @@ function onRowClick(index: string) {
 
   router.push({ path: `/set/${rowId}` });
 }
+
+watch(flashcardSets, () => {
+  emptyText.value = 'Du har ikke laget noen sett';
+});
 
 onMounted(async () => {
 
