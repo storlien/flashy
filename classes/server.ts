@@ -11,6 +11,7 @@ import type { Flashcard, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSet
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
     apiKey: 'AIzaSyB7CMMNEkOJkXUwhzZbF3ih8Wb7xL0xyBM',
+    storageBucket: 'gs://flashy-f8580.appspot.com',
 }
 
 const app = initializeApp(config);
@@ -25,7 +26,7 @@ class Server {
         this.auth = new Authenticator(app);
     }
 
-    // TODO: Can refactor this to return public flashcard sets, but filter out sets that are not yours
+    //TODO: Can refactor this to return public flashcard sets, but filter out sets that are not yours
     public async getUserFlashcardSets(): Promise<FlashcardSet[]> {
         const userId = this.auth.getUserId();
 
@@ -155,12 +156,17 @@ class Server {
         await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
 
-    public async createFlashcardSet(name: string, category: string, isPublic: boolean, flashcards: Flashcard[]): Promise<FlashcardSet | null> {
+    public async createFlashcardSet(name: string, category: string, isPublic: boolean, flashcards: Flashcard[], id: string): Promise<FlashcardSet | null> {
         if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
 
         const userId = this.auth.getUserId();
 
-        const set = {
+        if (!userId) throw new Error('Unauthorized');
+
+        const docRef = doc(collection(db, 'flashcard-sets'), id);
+
+        const set: FlashcardSet = {
+            id,
             name,
             userId,
             isPublic,
@@ -169,7 +175,7 @@ class Server {
         };
 
         try {
-            const docRef = await addDoc(collection(db, 'flashcard-sets'), set);
+            await setDoc(docRef, set);
             return docRef as unknown as FlashcardSet;
         } catch (error) {
             Server.logError(error);
@@ -266,18 +272,31 @@ class Server {
         }
     }
 
+    public getNewFlashcardSetId(): string {
+        const collectionRef = collection(db, 'flashcard-sets');
+        return doc(collectionRef).id;
+    }
+
     /** Upload image, return imageId */
-    public async uploadImage(file: File, flashcardSet: FlashcardSet): Promise<String | null> {
+    public async uploadImage(file: File, flashcardSetId: string, flashcardId: string, isQuestionImage: boolean): Promise<String | null> {
         const userId = this.auth.getUserId();
 
         if (!userId) throw new Error('Unauthorized');
 
-        const imageId = file.name + Date.now();
-        const storageRef = ref(storage, `images/${flashcardSet.id}/${imageId}`);
+        let imageId = flashcardId;
+
+        if (isQuestionImage) {
+            imageId += "_question";
+        } else {
+            imageId += "_answer";
+        }
+
+        const storageRef = ref(storage, `images/${flashcardSetId}/${imageId}`);
 
         const metadata: ImageMetadata = {
             customMetadata: {
                 userId,
+                flashcardSetId,
             }
         }
 

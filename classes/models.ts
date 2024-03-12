@@ -2,6 +2,8 @@ type Flashcard = {
     id: string;
     question: string;
     answer: string;
+    hasQuestionImage?: boolean;
+    hasAnswerImage?: boolean;
 }
 
 type FlashcardSet = {
@@ -34,7 +36,14 @@ type UserSettings = {
 type ImageMetadata = {
     customMetadata: {
         userId: string;
+        flashcardSetId: string;
     }
+}
+
+type ImageToUpload = {
+    file: File;
+    flashcardId: string;
+    isQuestionImage: boolean;
 }
 
 export {
@@ -43,4 +52,5 @@ export {
     type FlashcardSetPrefs,
     type UserSettings,
     type ImageMetadata,
+    type ImageToUpload,
 }
