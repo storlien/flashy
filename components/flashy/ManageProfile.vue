@@ -43,8 +43,9 @@
             <FormItem>
               <FormLabel>Brukernavn</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Oppdater brukernavn" v-bind="componentField" v-model="username" />
+                <Input type="text" placeholder="Oppdater brukernavn" v-bind="componentField" />
               </FormControl>
+              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -52,7 +53,7 @@
             <FormItem>
               <FormLabel>E-post</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="Oppdater e-post" v-bind="componentField" v-model="email" />
+                <Input type="email" placeholder="Oppdater e-post" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -67,11 +68,12 @@
               <FormMessage />
             </FormItem>
           </FormField>
-          <div class="h-4"></div>
+          <div class="h-2"></div>
           <DialogFooter class="w-full flex flex-row justify-between">
             <Button id="logout-button" variant="outline">
               <NuxtLink to="/login">Logg ut</NuxtLink>
             </Button>
+            <!-- <div class="w-full"></div> -->
             <Button type="submit">Lagre</Button>
           </DialogFooter>
         </Form>
@@ -90,21 +92,6 @@ import * as z from "zod";
 import server from "~/classes/server";
 
 const userSettings = ref<UserSettings | null>();
-
-const username = ref("User");
-const email = ref("Not found");
-// const password = ref("********");
-
-onMounted(async () => {
-  userSettings.value = server.userSettingsCache;
-
-  if (!userSettings.value) {
-    userSettings.value = await server.getUserSettings();
-  }
-
-  username.value = userSettings.value?.name ?? '';
-  email.value = userSettings.value?.email || "Ikke funnet";
-});
 
 const router = useRouter();
 
@@ -128,6 +115,17 @@ const formSchema = toTypedSchema(
 
 const form = useForm({
   validationSchema: formSchema,
+});
+
+onMounted(async () => {
+  userSettings.value = server.userSettingsCache;
+
+  if (!userSettings.value) {
+    userSettings.value = await server.getUserSettings();
+  }
+
+  form.setFieldValue('username', userSettings.value?.name ?? '');
+  form.setFieldValue('email', userSettings.value?.email ?? '');
 });
 
 const onSubmit = form.handleSubmit(async (formData) => {
