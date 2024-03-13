@@ -261,7 +261,7 @@ class Server {
     }
 
     /** Update user name */
-    public async updateUserName(name: string) {
+    public async updateUsername(name: string) {
         const userId = this.auth.getUserId();
 
         if (!userId) throw new Error('Unauthorized');

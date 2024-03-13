@@ -1,89 +1,90 @@
 <template>
-  <div class="flex items-center justify-center">
-    <!-- add username display-->
-    <h3 class="mx-5 text-sm">Bruker</h3>
-    <Dialog>
-      <DialogTrigger as-child>
+  <Dialog @update:open="(open) => {
+    if (open) updateFromCache();
+  }">
+    <DialogTrigger as-child>
+      <div class="flex items-center justify-center">
+        <h3 class="mx-3 text-base cursor-pointer">{{
+    server.userSettingsCache.name ?? 'Bruker'
+  }}</h3>
         <Avatar class="cursor-pointer h-[45px] w-[45px]">
           <AvatarImage src="" alt="User avatar" />
           <AvatarFallback>
-            <span>{{
-              userSettings?.name ? userSettings.name.charAt(0) : "Bruker"
-            }}</span>
+            <span>
+              {{ server.userSettingsCache.name?.charAt(0) ?? 'B' }}
+            </span>
           </AvatarFallback>
         </Avatar>
-      </DialogTrigger>
-      <DialogContent class="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Profil</DialogTitle>
-        </DialogHeader>
+      </div>
+    </DialogTrigger>
+    <DialogContent class="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Profil</DialogTitle>
+      </DialogHeader>
 
-        <form @submit="onSubmit" class="grid gap-4 py-4">
-          <div class="relative flex justify-center">
-            <Label for="picture">
-              <Avatar class="h-[160px] w-[160px] cursor-pointer">
-                <AvatarImage src="" alt="User avatar" class="w-full h-full" />
-                <AvatarFallback class="text-xl">
-                  <span>{{
-              userSettings?.name
-                ? userSettings.name.charAt(0)
-                : "Bruker"
-            }}</span>
-                </AvatarFallback>
-              </Avatar>
-              <div class="absolute right-[115px] bottom-[10px] z-10 rounded-full overflow-hidden bg-[#dd1d4a] h-[35px]">
-                <Pencil color="white" class="w-[35px] h-[35px] p-[10px] cursor-pointer"></Pencil>
-              </div>
-            </Label>
-            <!--Needs vmodel and stuff -->
-            <Input id="picture" type="file" style="display: none" />
-          </div>
+      <form @submit="onSubmit" class="grid gap-4 py-4">
+        <div class="relative flex justify-center">
+          <Label for="picture">
+            <Avatar class="h-[160px] w-[160px] cursor-pointer">
+              <AvatarImage src="" alt="User avatar" class="w-full h-full" />
+              <AvatarFallback class="text-xl">
+                <span>
+                  {{ server.userSettingsCache.name?.charAt(0) ?? 'B' }}
+                </span>
+              </AvatarFallback>
+            </Avatar>
+            <div class="absolute right-[115px] bottom-[10px] z-10 rounded-full overflow-hidden bg-[#dd1d4a] h-[35px]">
+              <Pencil color="white" class="w-[35px] h-[35px] p-[10px] cursor-pointer"></Pencil>
+            </div>
+          </Label>
+          <Input id="picture" type="file" style="display: none" />
+        </div>
 
-          <FormField v-slot="{ componentField }" name="username">
-            <FormItem>
-              <FormLabel>Brukernavn</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="Oppdater brukernavn" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+        <FormField v-slot="{ componentField }" name="username">
+          <FormItem>
+            <FormLabel>Brukernavn</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="Oppdater brukernavn" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
 
-          <FormField v-slot="{ componentField }" name="email">
-            <FormItem>
-              <FormLabel>E-post</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="Oppdater e-post" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+        <FormField v-slot="{ componentField }" name="email">
+          <FormItem>
+            <FormLabel>E-post</FormLabel>
+            <FormControl>
+              <Input type="email" placeholder="Oppdater e-post" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
 
-          <FormField v-slot="{ componentField }" name="password">
-            <FormItem>
-              <FormLabel>Passord</FormLabel>
-              <FormControl>
-                <Input type="password" v-bind="componentField" placeholder="Oppdater passord" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <div class="h-2"></div>
-          <DialogFooter class="w-full flex flex-row justify-between">
-            <Button id="logout-button" variant="outline">
-              <NuxtLink to="/login">Logg ut</NuxtLink>
-            </Button>
-            <!-- <div class="w-full"></div> -->
-            <Button type="submit">Lagre</Button>
-          </DialogFooter>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  </div>
+        <FormField v-slot="{ componentField }" name="password">
+          <FormItem>
+            <FormLabel>Passord</FormLabel>
+            <FormControl>
+              <Input type="password" placeholder="Oppdater passord" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <div class="h-2"></div>
+
+        <DialogFooter class="w-full flex flex-row justify-between">
+          <Button id="logout-button" variant="outline">
+            <NuxtLink to="/login">Logg ut</NuxtLink>
+          </Button>
+          <!-- <div class="w-full"></div> -->
+          <Button type="submit">Lagre</Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
-import type { UserSettings } from "~/classes/models";
 import { Pencil } from "lucide-vue-next";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
@@ -91,18 +92,15 @@ import { useRouter } from "vue-router";
 import * as z from "zod";
 import server from "~/classes/server";
 
-const userSettings = ref<UserSettings | null>();
-
-const router = useRouter();
-
 const formSchema = toTypedSchema(
   z.object({
-    username: z.
-      string({ required_error: 'Obligatorisk' })
+    username: z
+      .string({ required_error: 'Obligatorisk' })
       .min(2, "Må ha minst 2 tegn")
       .max(25, "Kan ikke ha mer enn 25 tegn"),
     email: z
       .string({ required_error: 'Obligatorisk' })
+      .min(6, "Må ha minst 5 tegn")
       .email("Ugyldig e-postadresse"),
     password: z
       .string()
@@ -117,22 +115,14 @@ const form = useForm({
   validationSchema: formSchema,
 });
 
-onMounted(async () => {
-  userSettings.value = server.userSettingsCache;
-
-  if (!userSettings.value) {
-    userSettings.value = await server.getUserSettings();
-  }
-
-  form.setFieldValue('username', userSettings.value?.name ?? '');
-  form.setFieldValue('email', userSettings.value?.email ?? '');
-});
-
 const onSubmit = form.handleSubmit(async (formData) => {
   console.log(formData);
-  await server.updateUserName(formData.username);
 
-  if (formData.email && formData.email.length > 0) {
+  if (formData.username) {
+    await server.updateUsername(formData.username);
+  }
+
+  if (formData.email) {
     await server.updateUserEmail(formData.email);
   }
 
@@ -140,6 +130,15 @@ const onSubmit = form.handleSubmit(async (formData) => {
     await server.updateUserPassword(formData.password);
   }
 
-  router.push({ name: "profile" });
+  useRouter().go(0);
 });
+
+watch(server.userSettingsCache, () => {
+  updateFromCache();
+});
+
+function updateFromCache() {
+  form.setFieldValue('username', server.userSettingsCache.name ?? '', true);
+  form.setFieldValue('email', server.userSettingsCache.email ?? '', true);
+}
 </script>
