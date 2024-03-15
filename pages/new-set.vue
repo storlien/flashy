@@ -32,7 +32,7 @@
         <Card class="card">
           <div>
             <Label for="picture">Picture</Label> <!--Needs vmodel and stuff-->
-            <Input id="picture" type="file" />
+            <Input id="picture" type="file" @change="prepareFileUpload($event, row.id, index, true)" />
           </div>
           <CardContent class="card-content">
             <Textarea
@@ -48,7 +48,7 @@
         <Card class="card">
           <div>
             <Label for="picture">Picture</Label> <!--Needs vmodel and stuff-->
-            <Input id="picture" type="file" />
+            <Input id="picture" type="file" @change="prepareFileUpload($event, row.id, index, false)" />
           </div>
           <CardContent class="card-content">
             <Textarea
@@ -62,8 +62,6 @@
           </CardContent>
         </Card>
 
-        <!--<Input v-model="row.question" maxlength="500" type="Spørsmål" placeholder="Spørsmål" @input="limitText(row, 'question')"  />-->
-        <!-- <Input v-model="row.answer" maxlength="500" type="Svar" placeholder="Svar" @input="limitText(row, 'answer')" /> -->
         <Button @click="removeRow(index)" variant="outline">X</Button>
       </div>
       <div class="button-container">
@@ -157,12 +155,14 @@ import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
 import server from "~/classes/server";
 import { useRouter } from "vue-router";
-import type { Flashcard } from "~/classes/models";
+import type { Flashcard, ImageToUpload } from "~/classes/models";
 
 const router = useRouter();
 const name = ref("");
 const category = ref("");
 const isPublic = ref(false);
+const flashcardSetId = server.getNewFlashcardSetId();
+const imagesToUpload: ImageToUpload[] = []; 
 
 function canSave() {
   if (name.value.length === 0) return false;
@@ -196,8 +196,11 @@ async function createSet() {
     name.value,
     category.value,
     isPublic.value,
-    rows.value
+    rows.value,
+    flashcardSetId,
   );
+
+  await uploadImages(); //TODO dette kan ta litt tid, hva med en loading spinner?
 
   if (set) {
     console.log("Settet er lagret");
@@ -212,4 +215,43 @@ function limitText(row: Flashcard, field: "question" | "answer") {
     row[field] = row[field].slice(0, maxLength);
   }
 }
+
+function prepareFileUpload(event: Event, flashcardId: string, index: number, isQuestionImage: boolean) {
+  const file = (event.target as HTMLInputElement)?.files?.[0];
+
+  if (!file) {
+    console.log("No file")
+    return;
+  }
+
+  if (isQuestionImage) {
+    rows.value[index].hasQuestionImage = true;
+  } else {
+    rows.value[index].hasAnswerImage = true;
+  }
+
+  let alreadyExists = false;
+
+  for (const flashcard of imagesToUpload) {
+    if (flashcard.flashcardId === flashcardId && flashcard.isQuestionImage === isQuestionImage) {
+      flashcard.file = file;
+      alreadyExists = true;
+    }
+  }
+
+  if (!alreadyExists) {
+    imagesToUpload.push({
+    flashcardId,
+    file,
+    isQuestionImage,
+    });
+  }
+}
+
+async function uploadImages() {
+  for (const image of imagesToUpload) {
+    const response = await server.uploadImage(image.file, flashcardSetId, image.flashcardId, image.isQuestionImage);
+  }
+}
+
 </script>

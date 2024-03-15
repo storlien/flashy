@@ -4,28 +4,29 @@ import { Authenticator } from './authenticator';
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
-import type { Flashcard, FlashcardSet, FlashcardSetPrefs, UserSettings } from '~/classes/models';
-import { updateEmail, updatePassword } from 'firebase/auth';
+import { getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+
+import type { Flashcard, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings } from '~/classes/models';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
     apiKey: 'AIzaSyB7CMMNEkOJkXUwhzZbF3ih8Wb7xL0xyBM',
+    storageBucket: 'gs://flashy-f8580.appspot.com',
 }
-
-console.log(config.apiKey);
 
 const app = initializeApp(config);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 class Server {
     public readonly auth: Authenticator;
-    public readonly userSettingsCache = reactive<UserSettings>({name: '', email: '', favoriteSets: []});
+    public readonly userSettingsCache = reactive<UserSettings>({ name: '', email: '', favoriteSets: [] });
 
     constructor(app: FirebaseApp) {
         this.auth = new Authenticator(app);
     }
 
-    // TODO: Can refactor this to return public flashcard sets, but filter out sets that are not yours
+    //TODO: Can refactor this to return public flashcard sets, but filter out sets that are not yours
     public async getUserFlashcardSets(): Promise<FlashcardSet[]> {
         const userId = this.auth.getUserId();
 
@@ -155,12 +156,17 @@ class Server {
         await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
     }
 
-    public async createFlashcardSet(name: string, category: string, isPublic: boolean, flashcards: Flashcard[]): Promise<FlashcardSet | null> {
+    public async createFlashcardSet(name: string, category: string, isPublic: boolean, flashcards: Flashcard[], id: string): Promise<FlashcardSet | null> {
         if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
 
         const userId = this.auth.getUserId();
 
-        const set = {
+        if (!userId) throw new Error('Unauthorized');
+
+        const docRef = doc(collection(db, 'flashcard-sets'), id);
+
+        const set: FlashcardSet = {
+            id,
             name,
             userId,
             isPublic,
@@ -169,7 +175,7 @@ class Server {
         };
 
         try {
-            const docRef = await addDoc(collection(db, 'flashcard-sets'), set);
+            await setDoc(docRef, set);
             return docRef as unknown as FlashcardSet;
         } catch (error) {
             Server.logError(error);
@@ -225,13 +231,13 @@ class Server {
 
         if (docSnap.exists()) {
             const settings = docSnap.data() as UserSettings;
-            
+
             this.userSettingsCache.name = settings.name;
             this.userSettingsCache.email = settings.email;
             this.userSettingsCache.favoriteSets = settings.favoriteSets;
 
             return settings;
-        } 
+        }
 
         return null;
     }
@@ -299,7 +305,7 @@ class Server {
         if (docSnap.exists()) {
             return null;
         } else {
-            const settings: UserSettings =  {
+            const settings: UserSettings = {
                 name: null,
                 email: user!.email,
                 favoriteSets: [],
@@ -312,6 +318,77 @@ class Server {
 
             return settings;
         }
+    }
+
+    public getNewFlashcardSetId(): string {
+        const collectionRef = collection(db, 'flashcard-sets');
+        return doc(collectionRef).id;
+    }
+
+    /** Upload image, return imageId */
+    public async uploadImage(file: File, flashcardSetId: string, flashcardId: string, isQuestionImage: boolean): Promise<String | null> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        let imageId = flashcardId;
+
+        if (isQuestionImage) {
+            imageId += "_question";
+        } else {
+            imageId += "_answer";
+        }
+
+        const storageRef = ref(storage, `images/${flashcardSetId}/${imageId}`);
+
+        const metadata: ImageMetadata = {
+            customMetadata: {
+                userId,
+                flashcardSetId,
+            }
+        }
+
+        const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+
+                switch (snapshot.state) {
+                    case 'paused':
+                        console.log('Upload is paused');
+                        break;
+                    case 'running':
+                        console.log('Upload is running');
+                        break;
+                    case 'success':
+                        console.log('Upload is complete');
+                        break;
+                }
+
+            },
+            (error) => {
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        console.log('User does not have permission to access the object');
+                        break;
+                    case 'storage/canceled':
+                        console.log('User canceled the upload');
+                        break;
+                    case 'storage/unknown':
+                        console.log('Unknown error occurred, inspect error.serverResponse');
+                        break;
+                }
+            },
+            () => {
+                console.log('Upload complete');
+                return imageId;
+            }
+        );
+
+        return null;
+
     }
 
     /** Log an error caught in a try-catch. */
