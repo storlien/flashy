@@ -7,6 +7,7 @@ import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteD
 import { getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 
 import type { Flashcard, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings } from '~/classes/models';
+import { updateEmail, updatePassword } from 'firebase/auth';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
