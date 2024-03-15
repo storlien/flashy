@@ -68,7 +68,7 @@
 .header {
   font-size: 30px;
   font-weight: bold;
-  color: #cf1f3c;
+  color: #dd1d4a;
   margin-bottom: 20px;
 }
 
@@ -79,3 +79,11 @@
   margin-right: 50px;
 }
 </style>
+
+<script setup lang="ts"> 
+
+definePageMeta({
+  middleware: 'auth',
+});
+
+</script>

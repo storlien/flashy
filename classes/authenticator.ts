@@ -1,5 +1,6 @@
 import type { FirebaseApp } from 'firebase/app';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, type Auth, type UserCredential, type User } from 'firebase/auth';
+import server from './server';
 
 class Authenticator {
   private readonly auth: Auth;

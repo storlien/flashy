@@ -3,17 +3,6 @@
   <div id="profile">
     <div></div>
     <div id="center-column">
-
-
-      <div id="profile-left">
-        <Button id="logout-button" @click="logout">
-          Logg ut
-        </Button>
-        <ManageProfile id="editprofile"></ManageProfile>
-      </div>
-
-
-
       <div class="space" :style="{ height: '10vh' }"></div>
 
       <div id="table-container">

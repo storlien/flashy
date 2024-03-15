@@ -5,6 +5,7 @@ import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 import type { Flashcard, FlashcardSet, FlashcardSetPrefs, UserSettings } from '~/classes/models';
+import { updateEmail, updatePassword } from 'firebase/auth';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -233,6 +234,54 @@ class Server {
         } 
 
         return null;
+    }
+
+    /** Update user settings */
+    public async updateUserSettings(settings: UserSettings) {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            await updateDoc(docRef, settings);
+            console.log('Successfully updated user settings');
+        }
+    }
+
+    /**Update email */
+    public async updateUserEmail(email: string) {
+        if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
+        if (!email) throw new Error('Invalid email');
+        if (this.auth.getUser() === null) throw new Error('Invalid user');
+        updateEmail(this.auth.getUser()!, email);
+    }
+
+    /** Update user name */
+    public async updateUsername(name: string) {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            await updateDoc(docRef, { name });
+            console.log('Successfully updated user name');
+        }
+    }
+
+    /** Update user password */
+    public async updateUserPassword(password: string) {
+        if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
+        if (!password) throw new Error('Invalid password');
+        if (this.auth.getUser() === null) throw new Error('Invalid user');
+        updatePassword(this.auth.getUser()!, password);
     }
 
     /** Creates empty user settings document */
