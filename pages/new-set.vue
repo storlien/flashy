@@ -41,11 +41,8 @@
                 type="file"
                 @change="
                   prepareFileUpload($event, row.id, index, true);
-                  loadPreview($event, index, true);
                 "
-                lang="no"
                 class="hidden"
-                ref="fileInput"
               />
               <button @click="triggerImageInput(index, true)"><Image color="#dd1d4a" class="w-12 h-12"/></button>
             </div>
@@ -79,7 +76,6 @@
                 type="file"
                 @change="
                   prepareFileUpload($event, row.id, index, false);
-                  loadPreview($event, index, false);
                 "
                 class="hidden"
               />
@@ -116,9 +112,8 @@
 
       <div class="space" :style="{ height: '10vh' }"></div>
     </div>
-
-    <!-- Combobox til kategorier -->
   </div>
+  <FlashyAlert v-model:open="shouldOpen" title="Ikke støttet filtype" text="Du får bare laste opp filer i følgende formater: jpg, jpeg, png, gif" okBtn="Tilbake"></FlashyAlert>
 </template>
 
 <style lang="scss">
@@ -263,6 +258,7 @@ const flashcardSetId = server.getNewFlashcardSetId();
 const imagesToUpload: ImageToUpload[] = [];
 const imgURLs = ref<previewImage[]>([]);
 const maxLength = ref<maxLength[]>([]);
+const shouldOpen = ref(false);
 
 interface previewImage {
   questionURL: string;
@@ -342,6 +338,19 @@ function prepareFileUpload(
     console.log("No file");
     return;
   }
+
+  const fileExtension = file.name?.split('.').pop()?.toLowerCase();
+
+  const isImage = fileExtension && ['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension);
+
+  if (!isImage) {
+    console.log("Not an image");
+    shouldOpen.value = true;
+    return;
+  }
+
+  loadPreview(event, index, isQuestionImage);
+
 
   if (isQuestionImage) {
     rows.value[index].hasQuestionImage = true;
