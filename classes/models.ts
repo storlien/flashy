@@ -24,6 +24,8 @@ type FlashcardSetPrefs = {
 
     /** List of card ids the user has marked as completed */
     completed: string[];
+
+    hasLiked: boolean;
 }
 
 type UserSettings = {

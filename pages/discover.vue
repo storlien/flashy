@@ -13,7 +13,7 @@
         </div>
         <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick"
           :empty-text="emptyText" />
-      </div>
+      <!-- </div>
       <div class="comments-container">
       <h2 class="titleComments">Kommentarer</h2>
       <div class="comments">
@@ -23,12 +23,12 @@
             <p>{{ comment.text }}</p>
           </div>
         </div>
-        <!-- Likes går her-->
+        Likes går her
       </div>
       <div className="kommentarboks">
         <Textarea placeholder="Skriv en kommentar her" v-model="comment"></Textarea>
         <Button :disabled="!comment" id="AddCommentButton" @click="createComment"> Legg til kommentar</Button>
-      </div>
+      </div> -->
     </div> 
     </div>
   </div>
@@ -135,17 +135,17 @@
 }
 
 #table {
-  width: 100%;
+  width: 100vw;
 }
 
-#comments {
-  margin-top: 50px;
-  margin-bottom: 50px;
-  border: 1px solid #f0f0f0;
-  border-radius: 5px;
-  padding: 20px;
+// #comments {
+//   margin-top: 50px;
+//   margin-bottom: 50px;
+//   border: 1px solid #f0f0f0;
+//   border-radius: 5px;
+//   padding: 20px;
 
-}
+// }
 </style>
 
 <script setup lang="ts">
@@ -154,23 +154,23 @@ import { columns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
 
-type Comment = {
-  userId: string,
-  text: string,
-}
+// type Comment = {
+//   userId: string,
+//   text: string,
+// }
 
-const comments = ref<Comment[]>([
-  {
-    userId: '65636etfgdf',
-    text: 'Flashy er kult',
-  },
-  {
-    userId: '564fgf4thr',
-    text: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. A neque, sapiente ipsam odit delectus facere architecto. Explicabo inventore, ipsum in, perspiciatis eaque doloremque officia quo itaque impedit porro magni nulla?',
-  },
-])
+// const comments = ref<Comment[]>([
+//   {
+//     userId: '65636etfgdf',
+//     text: 'Flashy er kult',
+//   },
+//   {
+//     userId: '564fgf4thr',
+//     text: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. A neque, sapiente ipsam odit delectus facere architecto. Explicabo inventore, ipsum in, perspiciatis eaque doloremque officia quo itaque impedit porro magni nulla?',
+//   },
+// ])
 
-const comment = ref("")
+// const comment = ref("")
 
 definePageMeta({
   middleware: 'auth',
@@ -211,11 +211,11 @@ function onRowClick(index: string) {
   router.push({ path: `/set/${rowId}` });
 }
 
-function createComment() {
-  comments.value.push({userId: "silje", text: comment.value})
-  comment.value = ""
+// function createComment() {
+//   comments.value.push({userId: "silje", text: comment.value})
+//   comment.value = ""
 
-}
+// }
 
 onMounted(async () => {
   allSets.value = await server.getPublicFlashcardSets();

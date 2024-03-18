@@ -3,10 +3,34 @@ import { AngryIcon, HelpCircleIcon } from 'lucide-vue-next';
 import type { Flashcard, FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
 import { Progress as ProgressBar } from '~/components/ui/progress';
+import FavoriteButton from '~/components/FavoriteButton.vue';
 
+type Comment = {
+  userId: string,
+  text: string,
+}
+
+const comments = ref<Comment[]>([
+  {
+    userId: '65636etfgdf',
+    text: 'Flashy er kult',
+  },
+  {
+    userId: '564fgf4thr',
+    text: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. A neque, sapiente ipsam odit delectus facere architecto. Explicabo inventore, ipsum in, perspiciatis eaque doloremque officia quo itaque impedit porro magni nulla?',
+  },
+])
+
+const comment = ref("")
 definePageMeta({
   middleware: 'auth',
 });
+
+function createComment() {
+  comments.value.push({ userId: "silje", text: comment.value })
+  comment.value = ""
+
+}
 
 const route = useRoute();
 const id = route.params.id;
@@ -185,6 +209,30 @@ onMounted(async () => {
       <AngryIcon color="#dd1d4a" class="w-10 h-10"></AngryIcon>
     </button>
   </div>
+
+  <div>
+    <div class="comments-container">  
+      <LikeButton class="numberOfLikes">
+        </LikeButton> 
+      <div class="center-column">
+        <h2 class="titleComments">Kommentarer</h2>
+        <div class="comments">
+          <div v-for="comment in comments">
+            <div class="comment">
+              <h3>{{ comment.userId }}</h3>
+              <p>{{ comment.text }}</p>
+            </div>
+          </div>
+        </div>
+        <div className="kommentarboks">
+          <Textarea placeholder="Skriv en kommentar her" v-model="comment"></Textarea>
+          <Button :disabled="!comment" id="AddCommentButton" @click="createComment"> Legg til kommentar</Button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 </template>
 
 <style lang="scss">
@@ -203,7 +251,7 @@ onMounted(async () => {
 .buttons {
   position: relative;
   margin-top: 8vh;
-  
+
   display: flex;
   gap: 40px;
   flex-direction: row;
@@ -214,7 +262,7 @@ onMounted(async () => {
 
 .set-page {
   position: relative;
-  margin: 4vh 0;  
+  margin: 4vh 0;
   width: 100vw;
 
   display: flex;
@@ -304,5 +352,28 @@ onMounted(async () => {
   to {
     transform: translateX(500%) rotateZ(1000deg) scale(0.1);
   }
+}
+
+#comments {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  border: 1px solid #f0f0f0;
+  border-radius: 5px;
+  padding: 20px;
+
+}
+
+.comments-container {
+  width: 100vw;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+}
+
+.center-column {
+  grid-column: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 </style>
