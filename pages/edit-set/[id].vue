@@ -36,7 +36,7 @@
         <Card class="card">
           <div>
             <div
-              v-if="imgURLs[index].questionURL.length == 0"
+              v-if="imgURLs.find(urls => urls.cardId == row.id)?.questionURL.length == 0 || imgURLs.find(urls => urls.cardId == row.id)?.questionURL == null"
               class="m-3 input-container"
             >
               <Input
@@ -53,7 +53,7 @@
               class="image-container"
               v-if="imgURLs[index].questionURL.length != 0"
             >
-              <img :src="imgURLs[index].questionURL" class="flashcard-image" />
+              <img :src="imgURLs.find(urls => urls.cardId === row.id)?.questionURL ?? ''" class="flashcard-image" />
               <button @click="removePreview(index, true)">
                 <XCircle color="#dd1d4a" class="w-40 h-40 delete-icon" />
               </button>
@@ -77,7 +77,7 @@
         <Card class="card">
           <div>
             <div
-              v-if="imgURLs[index].answerURL.length == 0"
+              v-if="imgURLs.find(urls => urls.cardId == row.id)?.answerURL.length == 0 || imgURLs.find(urls => urls.cardId == row.id)?.answerURL == null"
               class="m-3 input-container"
             >
               <Input
@@ -94,7 +94,7 @@
               class="image-container"
               v-if="imgURLs[index].answerURL.length != 0"
             >
-              <img :src="imgURLs[index].answerURL" class="flashcard-image" />
+              <img :src="imgURLs.find(urls => urls.cardId === row.id)?.answerURL ?? ''" class="flashcard-image" />
               <button @click="removePreview(index, false)">
                 <XCircle class="delete-icon" color="#dd1d4a" />
               </button>
@@ -116,7 +116,7 @@
           </CardContent>
         </Card>
 
-        <Button @click="removeRow(index)" variant="outline">X</Button>
+        <Button @click="removeRow(row.id)" variant="outline">X</Button>
       </div>
       <div class="button-container">
         <Button type="submit" @click="addRow">Legg til spørsmål</Button>
@@ -262,7 +262,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
 import server from "~/classes/server";
 import { useRouter } from "vue-router";
-import type { Flashcard, FlashcardSet, ImageToUpload } from "~/classes/models";
+import type { Flashcard, FlashcardImages, FlashcardSet, ImageToUpload } from "~/classes/models";
 import { XCircle } from "lucide-vue-next";
 import { Image } from "lucide-vue-next";
 
@@ -273,17 +273,14 @@ const category = ref("");
 const isPublic = ref(false);
 const flashcardSetId = route.params.id;
 const imagesToUpload: ImageToUpload[] = [];
-const imgURLs = ref<previewImage[]>([]);
+const imgURLs = ref<FlashcardImages[]>([]);
 const maxLength = ref<maxLength[]>([]);
 const shouldOpen = ref(false);
 const setId = route.params.id;
-
-interface previewImage {
-  questionURL: string;
-  answerURL: string;
-}
+const cardSet = ref<FlashcardSet | null>(null);
 
 interface maxLength {
+  id: string;
   question: number;
   answer: number;
 }
@@ -302,21 +299,23 @@ definePageMeta({
 
 const rows = ref<Flashcard[]>([]);
 
-onMounted(() => {
-  if (rows.value.length === 0) addRow();
-});
-
 addRow();
 
 function addRow() {
-  rows.value.push({ id: uuidv4(), question: "", answer: "" });
-  imgURLs.value.push({ questionURL: "", answerURL: "" });
-  maxLength.value.push({ question: 200, answer: 200 });
+  const id = uuidv4();
+  console.log(id);
+  rows.value.push({ id: id, question: "", answer: "" });
+  imgURLs.value.push({ cardId: id, questionURL: "", answerURL: "" });
+  maxLength.value.push({ id: id, question: 200, answer: 200 });
+  console.log(rows.value);
 }
-function removeRow(index: number) {
-  rows.value.splice(index, 1);
-  imgURLs.value.splice(index, 1);
-  maxLength.value.splice(index, 1);
+
+function removeRow(id: string) {
+  const row = rows.value.find(row => row.id === id);
+  if (!row) return;
+  rows.value.splice(rows.value.indexOf(row), 1);
+  imgURLs.value.splice(rows.value.indexOf(row), 1);
+  maxLength.value.splice(rows.value.indexOf(row), 1);
 }
 
 let set: FlashcardSet | null = null;
@@ -345,7 +344,34 @@ onMounted(async () => {
   if (typeof setId !== "string") return;
 
   await getFlashcardSet(setId);
+
+  for (let index = 0; index < rows.value.length; index++) {
+    imgURLs.value.push({cardId:"", questionURL: "", answerURL: "" });
+  }
+
+  await getImages();
 });
+
+async function getImages() {
+  if (!cardSet.value) return;
+  const images = await server.getImagesForFlashcardSet(cardSet.value);
+
+  for (const image of images) {
+    imgURLs.value.push({
+      cardId: image.cardId,
+      questionURL: image.questionURL?? "",
+      answerURL: image.answerURL?? "",})
+  }
+
+  console.log(images);
+  console.log(imgURLs.value);
+  // for (let index = 0; index < images.length; index += 2) {
+  //   imgURLs[index] = {
+  //     questionURL: images[index]?.url ?? '',
+  //     answerURL: images[index + 1]?.url ?? '',
+  //   };
+  // }
+}
 
 async function getFlashcardSet(id: string) {
   set = await server.getFlashcardSet(id);
@@ -357,6 +383,8 @@ async function getFlashcardSet(id: string) {
   rows.value = set!.flashcards;
   name.value = set.name;
   category.value = set.category;
+
+  cardSet.value = set;
 }
 
 function limitText(row: Flashcard, field: "question" | "answer") {
@@ -390,7 +418,7 @@ function prepareFileUpload(
     return;
   }
 
-  loadPreview(event, index, isQuestionImage);
+  loadPreview(event, flashcardId, isQuestionImage);
 
   if (isQuestionImage) {
     rows.value[index].hasQuestionImage = true;
@@ -430,7 +458,7 @@ async function uploadImages() {
   }
 }
 
-function loadPreview(event: Event, index: number, isQuestion: boolean) {
+function loadPreview(event: Event, id: string, isQuestion: boolean) {
   console.log("loadPreview");
   const file = (event.target as HTMLInputElement)?.files?.[0];
 
@@ -440,8 +468,16 @@ function loadPreview(event: Event, index: number, isQuestion: boolean) {
   }
 
   if (isQuestion) {
-    imgURLs.value[index].questionURL = URL.createObjectURL(file);
+    const card = imgURLs.value.find(urls => urls.cardId === id);
+    if (card) {
+      card.questionURL = URL.createObjectURL(file);
+    }
+    
   } else {
+    const card = imgURLs.value.find(urls => urls.cardId === id);
+    if (card) {
+      card.questionURL = URL.createObjectURL(file);
+    }
     imgURLs.value[index].answerURL = URL.createObjectURL(file);
   }
 
