@@ -6,6 +6,12 @@ type Flashcard = {
     hasAnswerImage?: boolean;
 }
 
+type FlashcardImage = {
+    cardId: string;
+    type: 'question' | 'answer';
+    url: string;
+}
+
 type FlashcardSet = {
     id: string;
     userId: string;
@@ -48,6 +54,7 @@ type ImageToUpload = {
 
 export {
     type Flashcard,
+    type FlashcardImage,
     type FlashcardSet,
     type FlashcardSetPrefs,
     type UserSettings,
