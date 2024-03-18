@@ -60,10 +60,9 @@
             <Textarea
               class="flex-1 items-center h-full text resize-none text-center center"
               v-model="row.question"
-              maxlength="200"
+              :maxlength=maxLength[index].question
               type="Spørsmål"
               placeholder="Spørsmål"
-              @input="limitText(row, 'question')"
               :class="{'reducedSize': imgURLs[index].questionURL.length != 0, 'fullSize': imgURLs[index].questionURL.length == 0}"
             ></Textarea>
           </CardContent>
@@ -95,10 +94,9 @@
             <Textarea
               class=" text resize-none text-center center"
               v-model="row.answer"
-              maxlength={{maxLength[index].answer}}
+              :maxlength=maxLength[index].answer
               type="Svar"
               placeholder="Svar"
-              @input="limitText(row, 'answer')"
               :class="{'reducedSize': imgURLs[index].answerURL.length != 0, 'fullSize': imgURLs[index].answerURL.length == 0}"
             ></Textarea>
           </CardContent>
@@ -293,7 +291,7 @@ addRow();
 function addRow() {
   rows.value.push({ id: uuidv4(), question: "", answer: "" });
   imgURLs.value.push({ questionURL: "", answerURL: "" });
-  maxLength.value.push({ question: 200, answer: 200 });
+  maxLength.value.push({ question: 100, answer: 100 });
 }
 function removeRow(index: number) {
   rows.value.splice(index, 1);
@@ -319,12 +317,6 @@ async function createSet() {
     console.log("Ånei, noe gikk galt");
   }
 }
-function limitText(row: Flashcard, field: "question" | "answer") {
-  const maxLength = 500;
-  if (row[field].length > maxLength) {
-    row[field] = row[field].slice(0, maxLength);
-  }
-}
 
 function prepareFileUpload(
   event: Event,
@@ -332,6 +324,9 @@ function prepareFileUpload(
   index: number,
   isQuestionImage: boolean
 ) {
+  if (isQuestionImage) maxLength.value[index].question = 25;
+  else maxLength.value[index].answer = 25;
+
   const file = (event.target as HTMLInputElement)?.files?.[0];
 
   if (!file) {
