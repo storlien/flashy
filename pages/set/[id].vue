@@ -3,7 +3,7 @@ import { AngryIcon, HelpCircleIcon } from 'lucide-vue-next';
 import type { Flashcard, FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
 import { Progress as ProgressBar } from '~/components/ui/progress';
-import FavoriteButton from '~/components/FavoriteButton.vue';
+import LikeButton from '~/components/LikeButton.vue';
 
 type Comment = {
   userId: string,
@@ -211,28 +211,26 @@ onMounted(async () => {
   </div>
 
   <div>
-    <div class="comments-container">  
-      <LikeButton class="numberOfLikes">
-        </LikeButton> 
-      <div class="center-column">
+  <div class="comments-container">  
+    <div class="center-column">
+      
+      <div class="comments">
+        <LikeButton class="numberOfLikes"></LikeButton> 
         <h2 class="titleComments">Kommentarer</h2>
-        <div class="comments">
-          <div v-for="comment in comments">
-            <div class="comment">
-              <h3>{{ comment.userId }}</h3>
-              <p>{{ comment.text }}</p>
-            </div>
+        <div v-for="comment in comments">
+          <div class="comment">
+            <h3>{{ comment.userId }}</h3>
+            <p>{{ comment.text }}</p>
           </div>
         </div>
-        <div className="kommentarboks">
-          <Textarea placeholder="Skriv en kommentar her" v-model="comment"></Textarea>
-          <Button :disabled="!comment" id="AddCommentButton" @click="createComment"> Legg til kommentar</Button>
-        </div>
+      </div>
+      <div class="newComment">
+        <Textarea placeholder="Skriv en kommentar her" v-model="comment"></Textarea>
+        <Button :disabled="!comment" id="AddCommentButton" @click="createComment">Legg til kommentar</Button>
       </div>
     </div>
   </div>
-
-
+</div>
 </template>
 
 <style lang="scss">
@@ -371,9 +369,14 @@ onMounted(async () => {
 
 .center-column {
   grid-column: 2;
-
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+.newComment {
+  grid-column: 2;
+  flex-direction: left;
+  width: 100%;
 }
 </style>
