@@ -48,6 +48,15 @@ type ImageToUpload = {
     isQuestionImage: boolean;
 }
 
+type Comment = {
+    userId: string,
+    text: string,
+}
+
+type Comments = {
+    comments: Comment[]
+}
+
 export {
     type Flashcard,
     type FlashcardSet,
@@ -55,4 +64,6 @@ export {
     type UserSettings,
     type ImageMetadata,
     type ImageToUpload,
+    type Comment,
+    type Comments,
 }
