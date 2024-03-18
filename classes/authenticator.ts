@@ -1,5 +1,6 @@
 import type { FirebaseApp } from 'firebase/app';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, type Auth, type UserCredential, type User } from 'firebase/auth';
+import server from './server';
 
 class Authenticator {
   private readonly auth: Auth;
@@ -44,7 +45,12 @@ class Authenticator {
 
       return credentials;
     } catch (error: any) {
-      Authenticator.logError(error);
+      if (error.code === 'auth/email-already-in-use') {
+        alert('E-posten er allerede i bruk!');
+      } else {
+        Authenticator.logError(error);
+      }
+      
 
       return null;
     }
@@ -57,9 +63,17 @@ class Authenticator {
 
       return credentials;
     } catch (error: any) {
-      Authenticator.logError(error);
+      if (error.code === 'auth/invalid-credential') {
+        alert('Feil e-post eller passord!');
+      } else {
+        Authenticator.logError(error);
+      }
       return null;
     }
+  }
+
+  public async logout() {
+    await this.auth.signOut();
   }
 
   /** Log an error caught in a try-catch. */

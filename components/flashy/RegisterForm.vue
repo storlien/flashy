@@ -10,12 +10,12 @@ const router = useRouter();
 
 const formSchema = toTypedSchema(
   z.object({
-    email: z.string().email("Must be a valid email"),
+    email: z.string().email("Må være en gyldig e-post"),
     password: z
       .string()
-      .min(6)
-      .max(25)
-      .regex(/.*[0-9].*/, "Password must contain at least one number"),
+      .min(6, "Passordet må være minst 6 tegn")
+      .max(25, "Passordet kan ikke være mer enn 25 tegn")
+      .regex(/.*[0-9].*/, "Passordet må inneholde minst ett tall"),
   })
 );
 
