@@ -19,7 +19,6 @@ import AlertDialog from '../ui/alert-dialog/AlertDialog.vue';
 import AlertDialogTitle from '../ui/alert-dialog/AlertDialogTitle.vue';
 import AlertDialogContent from '../ui/alert-dialog/AlertDialogContent.vue';
 import AlertDialogAction from '../ui/alert-dialog/AlertDialogAction.vue';
-import AlertDialogCancel from '../ui/alert-dialog/AlertDialogCancel.vue';
 import AlertDialogHeader from '../ui/alert-dialog/AlertDialogHeader.vue';
 import AlertDialogDescription from '../ui/alert-dialog/AlertDialogDescription.vue';
 import AlertDialogFooter from '../ui/alert-dialog/AlertDialogFooter.vue';
