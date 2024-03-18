@@ -3,7 +3,11 @@
     <div></div>
     <div id="center-column">
       <div id="header-buttons">
-        <Button id="avbrytKnapp" variant="outline" @click="$router.push('/profile')">
+        <Button
+          id="avbrytKnapp"
+          variant="outline"
+          @click="$router.push('/profile')"
+        >
           Avbryt
         </Button>
         <Button id="create-button" @click="createSet" :disabled="!canSave()">
@@ -31,8 +35,29 @@
         <p>{{ index + 1 }}</p>
         <Card class="card">
           <div>
-            <Label for="picture">Picture</Label> <!--Needs vmodel and stuff-->
-            <Input id="picture" type="file" @change="prepareFileUpload($event, row.id, index, true)" />
+            <div v-if="imgURLs[index].questionURL.length == 0" class="m-3 input-container">
+              <Input
+                :id="'questionFileInput' + index"
+                type="file"
+                @change="
+                  prepareFileUpload($event, row.id, index, true);
+                  loadPreview($event, index, true);
+                "
+                lang="no"
+                class="hidden"
+                ref="fileInput"
+              />
+              <button @click="triggerImageInput(index, true)"><Image color="#dd1d4a" class="w-12 h-12"/></button>
+            </div>
+            <div
+              class="image-container"
+              v-if="imgURLs[index].questionURL.length != 0"
+            >
+              <img :src="imgURLs[index].questionURL" class="flashcard-image" />
+              <button @click="removePreview(index, true)">
+                <XCircle color="#dd1d4a" class="w-40 h-40 delete-icon"/>
+              </button>
+            </div>
           </div>
           <CardContent class="card-content">
             <Textarea
@@ -42,22 +67,43 @@
               type="Spørsmål"
               placeholder="Spørsmål"
               @input="limitText(row, 'question')"
+              :class="{'reducedSize': imgURLs[index].questionURL.length != 0, 'fullSize': imgURLs[index].questionURL.length == 0}"
             ></Textarea>
           </CardContent>
         </Card>
         <Card class="card">
           <div>
-            <Label for="picture">Picture</Label> <!--Needs vmodel and stuff-->
-            <Input id="picture" type="file" @change="prepareFileUpload($event, row.id, index, false)" />
+            <div v-if="imgURLs[index].answerURL.length == 0" class="m-3 input-container">
+              <Input
+                :id="'answerFileInput' + index"
+                type="file"
+                @change="
+                  prepareFileUpload($event, row.id, index, false);
+                  loadPreview($event, index, false);
+                "
+                class="hidden"
+              />
+              <button @click="triggerImageInput(index, false)"><Image color="#dd1d4a" class="w-12 h-12"/></button>
+            </div>
+            <div
+              class="image-container"
+              v-if="imgURLs[index].answerURL.length != 0"
+            >
+              <img :src="imgURLs[index].answerURL" class="flashcard-image" />
+              <button @click="removePreview(index, false)">
+                <XCircle class="delete-icon" color="#dd1d4a" />
+              </button>
+            </div>
           </div>
           <CardContent class="card-content">
             <Textarea
-              class="flex-1 items-center h-full text resize-none text-center center"
+              class=" text resize-none text-center center"
               v-model="row.answer"
-              maxlength="200"
+              maxlength={{maxLength[index].answer}}
               type="Svar"
               placeholder="Svar"
               @input="limitText(row, 'answer')"
+              :class="{'reducedSize': imgURLs[index].answerURL.length != 0, 'fullSize': imgURLs[index].answerURL.length == 0}"
             ></Textarea>
           </CardContent>
         </Card>
@@ -101,8 +147,23 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   margin: 20px 0;
+}
+
+.image-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-container {
+  width: 250px;
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
 }
 
 #avbrytKnapp {
@@ -122,18 +183,17 @@
 }
 
 .card {
-  width: 600px;
-  height: 300px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  aspect-ratio: 5/7;
 }
 
 .text {
   font-size: 28px;
   font-weight: 600;
   padding-top: 80px;
-  margin-top: 25px;
   line-height: 1.5;
   height: 100%;
 }
@@ -142,12 +202,48 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  padding-bottom: 0;
 }
 
 #picture {
   width: 100%;
 }
+
+.reducedSize {
+  height: 110%;
+  padding-top: 0;
+  margin-top: 10px;
+}
+
+.fullSize {
+  height: 100%;
+  padding-top: 125px;
+  padding-bottom: 80px;
+  margin-top: 20px;
+}
+
+.delete-icon {
+  position: absolute;
+  top: 5px;
+  right: -15px;
+  background-color: white;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+}
+
+.flashcard-image {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
 </style>
 
 <script setup lang="ts">
@@ -156,13 +252,27 @@ import { Checkbox } from "@/components/ui/checkbox";
 import server from "~/classes/server";
 import { useRouter } from "vue-router";
 import type { Flashcard, ImageToUpload } from "~/classes/models";
+import { XCircle } from "lucide-vue-next";
+import { Image } from 'lucide-vue-next';
 
 const router = useRouter();
 const name = ref("");
 const category = ref("");
 const isPublic = ref(false);
 const flashcardSetId = server.getNewFlashcardSetId();
-const imagesToUpload: ImageToUpload[] = []; 
+const imagesToUpload: ImageToUpload[] = [];
+const imgURLs = ref<previewImage[]>([]);
+const maxLength = ref<maxLength[]>([]);
+
+interface previewImage {
+  questionURL: string;
+  answerURL: string;
+}
+
+interface maxLength {
+  question: number;
+  answer: number;
+}
 
 function canSave() {
   if (name.value.length === 0) return false;
@@ -186,9 +296,13 @@ addRow();
 
 function addRow() {
   rows.value.push({ id: uuidv4(), question: "", answer: "" });
+  imgURLs.value.push({ questionURL: "", answerURL: "" });
+  maxLength.value.push({ question: 200, answer: 200 });
 }
 function removeRow(index: number) {
   rows.value.splice(index, 1);
+  imgURLs.value.splice(index, 1);
+  maxLength.value.splice(index, 1);
 }
 async function createSet() {
   console.log(name.value, category.value, isPublic.value, rows.value);
@@ -197,7 +311,7 @@ async function createSet() {
     category.value,
     isPublic.value,
     rows.value,
-    flashcardSetId,
+    flashcardSetId
   );
 
   await uploadImages(); //TODO dette kan ta litt tid, hva med en loading spinner?
@@ -216,11 +330,16 @@ function limitText(row: Flashcard, field: "question" | "answer") {
   }
 }
 
-function prepareFileUpload(event: Event, flashcardId: string, index: number, isQuestionImage: boolean) {
+function prepareFileUpload(
+  event: Event,
+  flashcardId: string,
+  index: number,
+  isQuestionImage: boolean
+) {
   const file = (event.target as HTMLInputElement)?.files?.[0];
 
   if (!file) {
-    console.log("No file")
+    console.log("No file");
     return;
   }
 
@@ -233,7 +352,10 @@ function prepareFileUpload(event: Event, flashcardId: string, index: number, isQ
   let alreadyExists = false;
 
   for (const flashcard of imagesToUpload) {
-    if (flashcard.flashcardId === flashcardId && flashcard.isQuestionImage === isQuestionImage) {
+    if (
+      flashcard.flashcardId === flashcardId &&
+      flashcard.isQuestionImage === isQuestionImage
+    ) {
       flashcard.file = file;
       alreadyExists = true;
     }
@@ -241,17 +363,60 @@ function prepareFileUpload(event: Event, flashcardId: string, index: number, isQ
 
   if (!alreadyExists) {
     imagesToUpload.push({
-    flashcardId,
-    file,
-    isQuestionImage,
+      flashcardId,
+      file,
+      isQuestionImage,
     });
   }
 }
 
 async function uploadImages() {
   for (const image of imagesToUpload) {
-    const response = await server.uploadImage(image.file, flashcardSetId, image.flashcardId, image.isQuestionImage);
+    const response = await server.uploadImage(
+      image.file,
+      flashcardSetId,
+      image.flashcardId,
+      image.isQuestionImage
+    );
   }
 }
 
+function loadPreview(event: Event, index: number, isQuestion: boolean) {
+  console.log("loadPreview");
+  const file = (event.target as HTMLInputElement)?.files?.[0];
+
+  if (!file) {
+    console.log("No file");
+    return;
+  }
+
+  if (isQuestion) {
+    imgURLs.value[index].questionURL = URL.createObjectURL(file);
+  } else {
+    imgURLs.value[index].answerURL = URL.createObjectURL(file);
+  }
+
+  console.log(file);
+}
+
+function removePreview(index: number, isQuestion: boolean) {
+  if (isQuestion) {
+    imgURLs.value[index].questionURL = "";
+  } else {
+    imgURLs.value[index].answerURL = "";
+  }
+}
+
+function triggerImageInput(index : number, isQuestion : boolean) {
+  let inputId;
+  if (isQuestion) {
+    inputId = 'questionFileInput' + index;
+  } else {
+    inputId = 'answerFileInput' + index;
+  }
+  const inputElement = document.getElementById(inputId);
+  if (inputElement) {
+    inputElement.click();
+  }
+}
 </script>
