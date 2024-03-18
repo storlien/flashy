@@ -2,12 +2,13 @@ import type { FirebaseApp } from 'firebase/app';
 import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
-import { getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import { uploadBytesResumable } from 'firebase/storage';
 
-import type { Flashcard, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings } from '~/classes/models';
 import { updateEmail, updatePassword } from 'firebase/auth';
+import type { Flashcard, FlashcardImage, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings } from '~/classes/models';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -398,6 +399,44 @@ class Server {
         const errorMessage = error.message;
 
         console.error(errorCode, errorMessage);
+    }
+
+    public async getImagesForFlashcardSet(set: FlashcardSet): Promise<FlashcardImage[]> {
+        const urls: FlashcardImage[] = [];
+
+        const storage = getStorage(app);
+
+        set.flashcards.forEach(async (flashcard) => {
+            // Add question image
+            if (flashcard.hasQuestionImage) {
+                const path = `images/${set.id}/${flashcard.id}_question`;
+                const imageRef = ref(storage, path);
+
+                const url = await getDownloadURL(imageRef);
+
+                urls.push({
+                    cardId: flashcard.id,
+                    type: 'question',
+                    url,
+                });
+            }
+
+            // Add answer image
+            if (flashcard.hasAnswerImage) {
+                const path = `images/${set.id}/${flashcard.id}_answer`;
+                const imageRef = ref(storage, path);
+
+                const url = await getDownloadURL(imageRef);
+
+                urls.push({
+                    cardId: flashcard.id,
+                    type: 'answer',
+                    url,
+                });
+            }
+        });
+
+        return urls;
     }
 }
 
