@@ -7,8 +7,7 @@ import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 import { uploadBytesResumable } from 'firebase/storage';
 
-import { updateEmail, updatePassword } from 'firebase/auth';
-import type { Flashcard, FlashcardImage, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings } from '~/classes/models';
+import type { Flashcard, FlashcardSet, FlashcardSetPrefs, UserSettings } from '~/classes/models';
 import type { User } from 'firebase/auth';
 
 const config: FirebaseOptions = {
