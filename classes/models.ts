@@ -25,6 +25,7 @@ type FlashcardSetPrefs = {
 }
 
 type UserSettings = {
+    id?: string;
     name: string | null | undefined;
     email: string | null | undefined;
     role? : string | null;
