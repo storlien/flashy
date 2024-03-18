@@ -224,7 +224,7 @@ onMounted(async () => {
 .buttons {
   position: relative;
   margin-top: 8vh;
-  
+
   display: flex;
   gap: 40px;
   flex-direction: row;
@@ -235,7 +235,7 @@ onMounted(async () => {
 
 .set-page {
   position: relative;
-  margin: 4vh 0;  
+  margin: 4vh 0;
   width: 100vw;
 
   display: flex;

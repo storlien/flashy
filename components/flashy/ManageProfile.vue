@@ -100,7 +100,7 @@ const formSchema = toTypedSchema(
       .max(25, "Kan ikke ha mer enn 25 tegn"),
     email: z
       .string({ required_error: 'Obligatorisk' })
-      .min(6, "Må ha minst 5 tegn")
+      .min(6, "Må ha minst 6 tegn")
       .email("Ugyldig e-postadresse"),
     password: z
       .string()
@@ -142,3 +142,5 @@ function updateFromCache() {
   form.setFieldValue('email', server.userSettingsCache.email ?? '', true);
 }
 </script>
+
+rXun0VeObBhWqoKXbPaMVwXsXMD3
