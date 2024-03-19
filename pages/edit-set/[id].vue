@@ -319,8 +319,6 @@ async function saveChanges() {
   set.isPublic = isPublic.value;
   set.flashcards = flashcards.value;
 
-  alert(set.isPublic);
-
   for (const card of flashcards.value) {
     const urlPair = imgUrls.value.find(img => img.cardId === card.id);
 
