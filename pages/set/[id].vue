@@ -254,7 +254,7 @@ onMounted(async () => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .header {
   width: 100vw;
 
