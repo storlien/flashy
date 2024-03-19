@@ -22,6 +22,7 @@ const cardSet = ref<FlashcardSet | undefined>();
 const hardCards = ref<Set<string>>(new Set());
 
 const index = ref(0);
+const isLiked = ref(false);
 
 async function createComment() {
 
@@ -149,11 +150,21 @@ onMounted(async () => {
   await getPrefs();
   await getFlashcardSet();
   await getComments();
+  await checkLiked();
 
   if (!cards.value) return;
 
   shuffleCards(cards.value, hardCards.value);
 });
+
+async function onChangeLike() {
+  isLiked.value = !isLiked.value;
+  await server.changeLike(id as string);
+}
+
+async function checkLiked() {
+  isLiked.value = await server.isLiked(id as string);
+}
 
 </script>
 
@@ -226,7 +237,7 @@ onMounted(async () => {
     <div class="center-column">
       
       <div class="comments">
-        <LikeButton class="numberOfLikes"></LikeButton> 
+        <LikeButton :onChange="onChangeLike" :flashcardSetId="id as string" :isLiked="isLiked"></LikeButton> 
         <h2 class="titleComments">Kommentarer</h2>
         <div v-for="comment in comments">
           <div class="comment">

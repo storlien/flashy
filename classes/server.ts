@@ -436,6 +436,82 @@ class Server {
         }
     }
 
+    /** Get number of likes on flashcard set */
+    public async getNoLikes(flashcardSetId: string): Promise<number> {
+        const collectionRef = collection(db, 'flashcard-sets');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data() as FlashcardSet;
+
+            if (data.likes) {
+                return data.likes.length;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    /** Change whether a flashcard set is liked or not */
+    public async changeLike(flashcardSetId: string) {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'flashcard-sets');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+            return;
+        }
+
+        const data = docSnap.data() as FlashcardSet;
+
+        if (data.likes?.includes(userId)) {
+            data.likes = data.likes.filter(id => id !== userId);
+            await updateDoc(docRef, { likes: data.likes });
+        } else {
+            if (!data.likes) {
+                data.likes = [userId];
+                await updateDoc(docRef, { likes: data.likes });
+            } else {
+                data.likes.push(userId);
+                await updateDoc(docRef, { likes: data.likes });
+            }
+        }
+    }
+
+    public async isLiked(flashcardSetId: string): Promise<boolean> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'flashcard-sets');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+            return false;
+        }
+
+        const data = docSnap.data() as FlashcardSet;
+
+        if (data.likes?.includes(userId)) {
+            console.log('User has liked this set')
+            return true;
+        } else {
+            console.log('User has not liked this set')
+            return false;
+        }
+    }
+
     /** Log an error caught in a try-catch. */
     private static logError(error: any) {
         const errorCode = error.code;

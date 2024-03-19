@@ -13,6 +13,7 @@ type FlashcardSet = {
     name: string;
     category: string;
     flashcards: Flashcard[];
+    likes?: string[];
 }
 
 type FlashcardSetPrefs = {
