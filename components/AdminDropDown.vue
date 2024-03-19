@@ -1,29 +1,22 @@
 // DataTableDropDown.vue
 <script setup lang="ts">
-import { MoreHorizontal, PencilIcon, Trash2Icon } from 'lucide-vue-next';
+import { MoreHorizontal, UserRoundXIcon } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import server from '~/classes/server';
 import type { FlashcardSet } from '~/classes/models';
 
 const props = defineProps<{
-  set: FlashcardSet;
+  userId: string;
 }>();
 
 const router = useRouter();
 
-async function deleteSet(): Promise<void> {
-  const success = await server.deleteFlashcardSet(props.set);
+async function removeAdmin(): Promise<void> {
+  const success = await server.updateRole(props.userId, null);
 
   if (success) {
     router.go(0);
   }
-}
-
-function editSet(): void {
-  // navigateTo('/edit-set');
-  const rowId = props.set.id;
-
-  router.push({ path: `/edit-set/${rowId}` });
 }
 
 </script>
@@ -43,15 +36,10 @@ function editSet(): void {
       </DropdownMenuItem>
       <DropdownMenuSeparator /> -->
       <!-- <DropdownMenuItem>Rediger</DropdownMenuItem> -->
-      <DropdownMenuItem @click="editSet">
-        <PencilIcon class="mr-2 w-4 h-4"></PencilIcon>
-        <span>Rediger</span>
-      </DropdownMenuItem>
-      <DropdownMenuSeparator></DropdownMenuSeparator>
-      <DropdownMenuItem @click="deleteSet">
-        <Trash2Icon color="#dd1d4a" class="mr-2 w-4 h-4"></Trash2Icon>
-        <span class="text-[#dd1d4a]">Slett</span>
-      </DropdownMenuItem>
+      <DropdownMenuItem @click="removeAdmin">
+        <UserRoundXIcon color="#dd1d4a" class="mr-2 w-4 h-4"></UserRoundXIcon>
+        <span class="text-[#dd1d4a]">Fjern</span>
+    </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
 </template>

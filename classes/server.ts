@@ -221,6 +221,60 @@ class Server {
         }
     }
 
+    public async getAdmins(): Promise<UserSettings[]> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        let admins: UserSettings[] = [];
+
+        try {
+            const snapshot = await getDocs(collectionRef);
+
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return admins;
+            }
+
+            snapshot.forEach(doc => {
+                const user = doc.data() as UserSettings;
+                user.id = doc.id;
+
+                if (user.role === "admin") {
+                    admins.push(user);
+                }
+            });
+
+            return admins;
+
+        } catch (e) {
+            Server.logError(e);
+            return admins;
+        }
+    }
+
+    public async updateRole(userId: string, role: string | null): Promise<boolean> {
+        if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        const update = {
+            role
+        };
+
+        if (docSnap.exists()) {
+            await updateDoc(docRef, update);
+            return true;
+        }
+
+        return false;
+    }
+
+
+
     /** Get favorite flashcard sets */
     public async getUserSettings(): Promise<UserSettings | null> {
         const userId = this.auth.getUserId();
@@ -391,6 +445,126 @@ class Server {
 
         return null;
 
+    }
+
+    /** Uploads new comment */
+    public async uploadComment(comment: Comment, flashcardSetId: string) {
+        const collectionRef = collection(db, 'comments');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        let comments: Comments = await this.getComments(flashcardSetId);
+        comments.comments.push(comment);
+
+        await setDoc(docRef, comments);
+    }
+
+    /** Get all comments */
+    public async getComments(flashcardSetId: string): Promise<Comments> {
+        const collectionRef = collection(db, 'comments');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data() as Comments;
+        } else {
+            return { comments: [] };
+        }
+    }
+
+    /** If username is set, return it. If not, return email. If not email, then return user ID */
+    public async getNameOrEmail(userId: string): Promise<string> {
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data() as UserSettings;
+
+            if (data.name) {
+                return data.name;
+            } else {
+                return data.email!;
+            }
+        } else {
+            return userId;
+        }
+    }
+
+    /** Get number of likes on flashcard set */
+    public async getNoLikes(flashcardSetId: string): Promise<number> {
+        const collectionRef = collection(db, 'flashcard-sets');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data() as FlashcardSet;
+
+            if (data.likes) {
+                return data.likes.length;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    /** Change whether a flashcard set is liked or not */
+    public async changeLike(flashcardSetId: string) {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'flashcard-sets');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+            return;
+        }
+
+        const data = docSnap.data() as FlashcardSet;
+
+        if (data.likes?.includes(userId)) {
+            data.likes = data.likes.filter(id => id !== userId);
+            await updateDoc(docRef, { likes: data.likes });
+        } else {
+            if (!data.likes) {
+                data.likes = [userId];
+                await updateDoc(docRef, { likes: data.likes });
+            } else {
+                data.likes.push(userId);
+                await updateDoc(docRef, { likes: data.likes });
+            }
+        }
+    }
+
+    public async isLiked(flashcardSetId: string): Promise<boolean> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'flashcard-sets');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+            return false;
+        }
+
+        const data = docSnap.data() as FlashcardSet;
+
+        if (data.likes?.includes(userId)) {
+            console.log('User has liked this set')
+            return true;
+        } else {
+            console.log('User has not liked this set')
+            return false;
+        }
     }
 
     /** Log an error caught in a try-catch. */

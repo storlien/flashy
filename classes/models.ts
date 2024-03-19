@@ -19,6 +19,7 @@ type FlashcardSet = {
     name: string;
     category: string;
     flashcards: Flashcard[];
+    likes?: string[];
 }
 
 type FlashcardSetPrefs = {
@@ -30,9 +31,12 @@ type FlashcardSetPrefs = {
 
     /** List of card ids the user has marked as completed */
     completed: string[];
+
+    hasLiked: boolean;
 }
 
 type UserSettings = {
+    id?: string;
     name: string | null | undefined;
     email: string | null | undefined;
     role?: string | null;
@@ -52,6 +56,15 @@ type ImageToUpload = {
     isQuestionImage: boolean;
 }
 
+type Comment = {
+    userId: string,
+    text: string,
+}
+
+type Comments = {
+    comments: Comment[]
+}
+
 export {
     type Flashcard,
     type FlashcardImages,
@@ -60,4 +73,6 @@ export {
     type UserSettings,
     type ImageMetadata,
     type ImageToUpload,
+    type Comment,
+    type Comments,
 }

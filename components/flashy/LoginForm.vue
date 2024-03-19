@@ -8,8 +8,8 @@ import server from "~/classes/server";
 
 const formSchema = toTypedSchema(
   z.object({
-    email: z.string(), //check with database
-    password: z.string(), //check with database
+    email: z.string({required_error:"Obligatorisk"}).email("Må være en gyldig e-post"), //check with database
+    password: z.string({required_error:"Obligatorisk"}).min(1, "Obligatorisk"), //check with database
   })
 );
 

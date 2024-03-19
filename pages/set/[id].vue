@@ -17,6 +17,37 @@ const cardSet = ref<FlashcardSet | undefined>();
 const hardCards = ref<Set<string>>(new Set());
 
 const index = ref(0);
+const isLiked = ref(false);
+
+async function createComment() {
+
+  const newComment: Comment = {
+    userId: server.auth.getUserId()!,
+    text: comment.value
+  }
+
+  console.log('New comment: ', newComment)
+
+  await server.uploadComment(newComment, id as string);
+
+  comments.value.push({
+    userId: await server.getNameOrEmail(newComment.userId),
+    text: newComment.text
+  })
+  
+  comment.value = ""
+
+}
+
+async function getComments() {
+  const commentsFromServer: Comments = await server.getComments(id as string);
+  for (const c of commentsFromServer.comments) {
+    comments.value.push({
+      userId: await server.getNameOrEmail(c.userId),
+      text: c.text
+    });
+  }
+}
 
 // Cards visible in stack
 const stack = computed(() => {
@@ -112,6 +143,7 @@ async function getPrefs() {
 
   hardCards.value = new Set(prefs.difficult);
 }
+const images = ref<FlashcardImage[]>([]);
 
 const images = ref<FlashcardImages[]>([]);
 
@@ -188,11 +220,23 @@ onMounted(async () => {
   await getPrefs();
   await getFlashcardSet();
   await getImages();
+  await getComments();
+  await checkLiked();
 
   if (!cards.value) return;
 
   shuffleCards(cards.value, hardCards.value);
 });
+
+async function onChangeLike() {
+  isLiked.value = !isLiked.value;
+  await server.changeLike(id as string);
+}
+
+async function checkLiked() {
+  isLiked.value = await server.isLiked(id as string);
+}
+
 </script>
 
 <template>
@@ -281,6 +325,28 @@ onMounted(async () => {
       <AngryIcon color="#dd1d4a" class="w-10 h-10"></AngryIcon>
     </button>
   </div>
+
+  <div>
+  <div class="comments-container">  
+    <div class="center-column">
+      
+      <div class="comments">
+        <LikeButton :onChange="onChangeLike" :flashcardSetId="id as string" :isLiked="isLiked"></LikeButton> 
+        <h2 class="titleComments">Kommentarer</h2>
+        <div v-for="comment in comments">
+          <div class="comment">
+            <h3>{{ comment.userId }}</h3>
+            <p>{{ comment.text }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="newComment">
+        <Textarea placeholder="Skriv en kommentar her" v-model="comment"></Textarea>
+        <Button :disabled="!comment" id="AddCommentButton" @click="createComment">Legg til kommentar</Button>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <style lang="scss" scoped>
@@ -410,6 +476,52 @@ onMounted(async () => {
 @keyframes success {
   to {
     transform: translateX(500%) rotateZ(1000deg) scale(0.1);
+  }
+}
+
+.comments-container {
+  width: 100vw;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+}
+
+.center-column {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.newComment {
+  grid-column: 2;
+  flex-direction: left;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: start;
+
+  .comment {
+    width: 100%;
+    border: 2px solid #f0f0f0;
+    // margin: 0 20px;
+    padding: 20px;
+
+    h3 {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 12px;
+    }
+
+
+    border-radius: 10px;
   }
 }
 </style>
