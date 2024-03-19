@@ -203,7 +203,6 @@ const category = ref("");
 const isPublic = ref(false);
 const imgUrls = ref<FlashcardImages[]>([]);
 const shouldOpen = ref(false);
-const cardSet = ref<FlashcardSet | null>(null);
 
 const localImages = new Map<string, LocalImagePair>();
 
@@ -307,14 +306,11 @@ function removeImage(cardId: string, type: "question" | "answer") {
 }
 
 async function saveChanges() {
-  const set = cardSet.value;
-
-  if (!set) return;
-
-  set.category = category.value;
-  set.name = name.value;
-  set.isPublic = isPublic.value;
-  set.flashcards = flashcards.value;
+  const _category = category.value;
+  const _name = name.value;
+  const _isPublic = isPublic.value;
+  const _flashcards = flashcards.value;
+  const _setId = uuidv4();
 
   for (const card of flashcards.value) {
     const urlPair = imgUrls.value.find(img => img.cardId === card.id);
@@ -325,27 +321,25 @@ async function saveChanges() {
     }
   }
 
-  if (set) {
-    await server.createFlashcardSet(set.name, set.category, set.isPublic, set.flashcards, set.id);
-    await uploadImages(); //TODO dette kan ta litt tid, hva med en loading spinner?
-
-    router.push({ name: "profile" });
-  }
+  await server.createFlashcardSet(_name, _category, _isPublic, _flashcards, _setId);
+  await uploadImages(_setId); //TODO dette kan ta litt tid, hva med en loading spinner?
+  
+  router.push('/profile');
 }
 
 onMounted(() => {
   addRow();
 });
 
-async function uploadImages() {
+async function uploadImages(setId: string) {
   for (const [cardId, localImage] of localImages) {
     console.log(localImage);
     if (localImage.questionFile) {
-      await server.uploadImage(localImage.questionFile, cardSet.value!.id, cardId, true);
+      await server.uploadImage(localImage.questionFile, setId, cardId, true);
     }
 
     if (localImage.answerFile) {
-      await server.uploadImage(localImage.answerFile, cardSet.value!.id, cardId, false);
+      await server.uploadImage(localImage.answerFile, setId, cardId, false);
     }
   }
 }

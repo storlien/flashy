@@ -331,10 +331,7 @@ async function saveChanges() {
     await server.updateFlashcardSet(set);
     await uploadImages(); //TODO dette kan ta litt tid, hva med en loading spinner?
 
-    console.log("Settet er lagret");
-    router.push({ name: "profile" });
-  } else {
-    console.log("Ånei, noe gikk galt");
+    router.push('/profile');
   }
 }
 
