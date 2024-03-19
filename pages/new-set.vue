@@ -1,82 +1,5 @@
-<template>
-  <div id="new-set-page">
-    <div></div>
-    <div id="center-column">
-      <div id="header-buttons">
-        <Button id="avbrytKnapp" variant="outline" @click="$router.push('/profile')">
-          Avbryt
-        </Button>
-        <Button id="create-button" @click="createSet" :disabled="!canSave()">
-          Lagre
-        </Button>
-      </div>
-
-      <div class="space" :style="{ height: '10vh' }"></div>
-
-      <div id="name-category">
-        <Input id="name" placeholder="Navn" v-model="name" />
-        <Input id="category" placeholder="Kategori" v-model="category" />
-      </div>
-      <label
-        for="public"
-        class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-      >
-        Offentlig
-        <Checkbox id="public" v-model="isPublic" />
-      </label>
-
-      <div class="space" :style="{ height: '10vh' }"></div>
-
-      <div v-for="(row, index) in rows" class="row" :key="row.id">
-        <p>{{ index + 1 }}</p>
-        <Card class="card">
-          <div>
-            <Label for="picture">Picture</Label> <!--Needs vmodel and stuff-->
-            <Input id="picture" type="file" @change="prepareFileUpload($event, row.id, index, true)" />
-          </div>
-          <CardContent class="card-content">
-            <Textarea
-              class="flex-1 items-center h-full text resize-none text-center center"
-              v-model="row.question"
-              maxlength="200"
-              type="Spørsmål"
-              placeholder="Spørsmål"
-              @input="limitText(row, 'question')"
-            ></Textarea>
-          </CardContent>
-        </Card>
-        <Card class="card">
-          <div>
-            <Label for="picture">Picture</Label> <!--Needs vmodel and stuff-->
-            <Input id="picture" type="file" @change="prepareFileUpload($event, row.id, index, false)" />
-          </div>
-          <CardContent class="card-content">
-            <Textarea
-              class="flex-1 items-center h-full text resize-none text-center center"
-              v-model="row.answer"
-              maxlength="200"
-              type="Svar"
-              placeholder="Svar"
-              @input="limitText(row, 'answer')"
-            ></Textarea>
-          </CardContent>
-        </Card>
-
-        <Button @click="removeRow(index)" variant="outline">X</Button>
-      </div>
-      <div class="button-container">
-        <Button type="submit" @click="addRow">Legg til spørsmål</Button>
-      </div>
-
-      <div class="space" :style="{ height: '10vh' }"></div>
-    </div>
-
-    <!-- Combobox til kategorier -->
-  </div>
-</template>
-
-<style lang="scss">
-#new-set-page {
+<style lang="scss" scoped>
+#page {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
 
@@ -101,8 +24,9 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
-  margin: 20px 0;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 25px 0;
 }
 
 #avbrytKnapp {
@@ -121,137 +45,302 @@
   justify-content: center;
 }
 
-.card {
-  width: 600px;
-  height: 300px;
+.flashcard {
+  // width: 30vmin;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+
+  border-radius: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  background-color: white;
+
+  border: 2px solid #f0f0f0;
+  box-shadow: 0 5px 10px rgb(0.1, 0.1, 0.1, 0.1);
+
+  padding: 10px;
+
   display: flex;
   flex-direction: column;
-  align-items: center;
-}
+  gap: 10px;
 
-.text {
-  font-size: 28px;
-  font-weight: 600;
-  padding-top: 80px;
-  margin-top: 25px;
-  line-height: 1.5;
-  height: 100%;
-}
+  .image-input {
+    width: 100%;
+    aspect-ratio: 1;
+    flex-shrink: 0;
 
-.card-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
+    border: 2px dashed #f0f0f0;
+    border-radius: 5px;
 
-#picture {
-  width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+  }
+
+  .image-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .text-input {
+    flex-grow: 1;
+    width: 100%;
+    resize: none;
+    color: black;
+  }
 }
 </style>
 
+<template>
+  <NavBar></NavBar>
+  <div id="page">
+    <div></div>
+    <div id="center-column">
+      <div id="header-buttons">
+        <Button id="avbrytKnapp" variant="outline" @click="$router.push('/profile')">
+          Avbryt
+        </Button>
+        <Button id="create-button" @click="saveChanges" :disabled="!canSave()">
+          Lagre
+        </Button>
+      </div>
+
+      <div class="space" :style="{ height: '10vh' }"></div>
+
+      <div id="name-category">
+        <Input id="name" placeholder="Navn" v-model="name" />
+        <Input id="category" placeholder="Kategori" v-model="category" />
+      </div>
+      <label for="public"
+        class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        Offentlig
+        <Checkbox id="public" :checked="isPublic" @update:checked="isPublic = !isPublic" />
+      </label>
+
+      <div class="space" :style="{ height: '10vh' }"></div>
+
+      <div v-for="(card, index) in flashcards" class="row" :key="card.id">
+        <p>{{ index + 1 }}</p>
+
+        <div class="flashcard">
+          <label class="image-input">
+            <input type="file" accept="image/*" @change="(e) => changeImage(card, e, 'question')" hidden>
+            <ImageIcon v-if="!imgUrls[index].questionURL" color="#f0f0f0" class="image-icon w-12 h-12" />
+            <div v-else class="image-container">
+              <img :src="imgUrls[index].questionURL" />
+              <Button variant="ghost" class="absolute left-2 top-2 w-8 h-8 p-0"
+                @click.prevent="removeImage(card.id, 'question')">
+                <XCircle color="#dd1d4a" class="w-8 h-8"></XCircle>
+              </Button>
+            </div>
+          </label>
+          <Textarea class="text-input" v-model="card.question" :maxlength="100" placeholder="Spørsmål"></Textarea>
+        </div>
+        <div class="flashcard">
+          <label class="image-input">
+            <input type="file" accept="image/*" @change="(e) => changeImage(card, e, 'answer')" hidden>
+            <ImageIcon v-if="!imgUrls[index].answerURL" color="#f0f0f0" class="image-icon w-12 h-12" />
+            <div v-else class="image-container">
+              <img :src="imgUrls[index].answerURL" />
+              <Button variant="ghost" class="absolute left-2 top-2 w-8 h-8 p-0"
+                @click.prevent="removeImage(card.id, 'answer')">
+                <XCircle color="#dd1d4a" class="w-8 h-8"></XCircle>
+              </Button>
+            </div>
+          </label>
+          <Textarea class="text-input" v-model="card.answer" :maxlength="100" placeholder="Svar"></Textarea>
+        </div>
+
+        <Button @click="removeRow(card.id)" variant="ghost" class="w-8 h-8 p-0">
+          <XCircle color="#dd1d4a" class="w-8 h-8"></XCircle>
+        </Button>
+      </div>
+      <div class="h-10"></div>
+      <div class="button-container">
+        <Button type="submit" @click="addRow">Legg til spørsmål</Button>
+      </div>
+
+      <div class="space" :style="{ height: '10vh' }"></div>
+    </div>
+  </div>
+  <FlashyAlert v-model:open="shouldOpen" title="Ikke støttet filtype"
+    text="Du får bare laste opp filer i følgende formater: jpg, jpeg, png, gif" okBtn="Tilbake"></FlashyAlert>
+</template>
+
 <script setup lang="ts">
-import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
-import server from "~/classes/server";
+import { ImageIcon, XCircle } from "lucide-vue-next";
+import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "vue-router";
-import type { Flashcard, ImageToUpload } from "~/classes/models";
-
-const router = useRouter();
-const name = ref("");
-const category = ref("");
-const isPublic = ref(false);
-const flashcardSetId = server.getNewFlashcardSetId();
-const imagesToUpload: ImageToUpload[] = []; 
-
-function canSave() {
-  if (name.value.length === 0) return false;
-  if (category.value.length === 0) return false;
-  if (rows.value.length === 0) return false;
-
-  return true;
-}
+import type { Flashcard, FlashcardImages, FlashcardSet } from "~/classes/models";
+import server from "~/classes/server";
 
 definePageMeta({
   middleware: "auth",
 });
 
-const rows = ref<Flashcard[]>([]);
-
-onMounted(() => {
-  if (rows.value.length === 0) addRow();
-});
-
-addRow();
-
-function addRow() {
-  rows.value.push({ id: uuidv4(), question: "", answer: "" });
-}
-function removeRow(index: number) {
-  rows.value.splice(index, 1);
-}
-async function createSet() {
-  console.log(name.value, category.value, isPublic.value, rows.value);
-  const set = await server.createFlashcardSet(
-    name.value,
-    category.value,
-    isPublic.value,
-    rows.value,
-    flashcardSetId,
-  );
-
-  await uploadImages(); //TODO dette kan ta litt tid, hva med en loading spinner?
-
-  if (set) {
-    console.log("Settet er lagret");
-    router.push({ name: "profile" });
-  } else {
-    console.log("Ånei, noe gikk galt");
-  }
-}
-function limitText(row: Flashcard, field: "question" | "answer") {
-  const maxLength = 500;
-  if (row[field].length > maxLength) {
-    row[field] = row[field].slice(0, maxLength);
-  }
+type LocalImagePair = {
+  cardId: string;
+  questionFile?: File;
+  answerFile?: File;
 }
 
-function prepareFileUpload(event: Event, flashcardId: string, index: number, isQuestionImage: boolean) {
+const router = useRouter();
+const name = ref("");
+const category = ref("");
+const isPublic = ref(false);
+const imgUrls = ref<FlashcardImages[]>([]);
+const shouldOpen = ref(false);
+
+const localImages = new Map<string, LocalImagePair>();
+
+function canSave() {
+  if (name.value.length === 0) return false;
+  if (category.value.length === 0) return false;
+  if (flashcards.value.length === 0) return false;
+
+  return true;
+}
+
+function changeImage(card: Flashcard, event: Event, type: 'question' | 'answer') {
   const file = (event.target as HTMLInputElement)?.files?.[0];
 
-  if (!file) {
-    console.log("No file")
-    return;
-  }
+  if (!file) return;
 
-  if (isQuestionImage) {
-    rows.value[index].hasQuestionImage = true;
+  const url = URL.createObjectURL(file);
+
+  console.log(flashcards.value);
+  console.log(imgUrls.value);
+  const cardIndex = imgUrls.value.findIndex(img => img.cardId === card.id);
+
+  console.log(cardIndex);
+
+  if (cardIndex === -1) return;
+
+  if (type === 'question') {
+    imgUrls.value[cardIndex].questionURL = url;
   } else {
-    rows.value[index].hasAnswerImage = true;
+    imgUrls.value[cardIndex].answerURL = url;
   }
 
-  let alreadyExists = false;
+  if (localImages.has(card.id)) {
+    const localImage = localImages.get(card.id);
 
-  for (const flashcard of imagesToUpload) {
-    if (flashcard.flashcardId === flashcardId && flashcard.isQuestionImage === isQuestionImage) {
-      flashcard.file = file;
-      alreadyExists = true;
+    if (type === 'question') {
+      localImage!.questionFile = file;
+    } else {
+      localImage!.answerFile = file;
+    }
+
+    localImages.set(card.id, localImage!);
+  } else {
+    localImages.set(card.id, {
+      cardId: card.id,
+      questionFile: type === 'question' ? file : undefined,
+      answerFile: type === 'answer' ? file : undefined,
+    });
+  }
+
+}
+
+const flashcards = ref<Flashcard[]>([]);
+
+function addRow() {
+  const id = uuidv4();
+
+  flashcards.value.push({ id: id, question: "", answer: "" });
+  imgUrls.value.push({ cardId: id, questionURL: "", answerURL: "" });
+
+  console.log(flashcards.value);
+}
+
+function removeRow(id: string) {
+  const row = flashcards.value.find(row => row.id === id);
+
+  if (!row) return;
+
+  const index = flashcards.value.indexOf(row);
+
+  flashcards.value.splice(index, 1);
+  imgUrls.value.splice(index, 1);
+}
+
+function removeImage(cardId: string, type: "question" | "answer") {
+  const imgUrl = imgUrls.value.find(img => img.cardId === cardId);
+
+  if (!imgUrl) return;
+
+  if (type === "question") {
+    imgUrl.questionURL = "";
+  } else {
+    imgUrl.answerURL = "";
+  }
+
+  if (localImages.has(cardId)) {
+    const localImage = localImages.get(cardId);
+
+    if (type === "question") {
+      localImage!.questionFile = undefined;
+    } else {
+      localImage!.answerFile = undefined;
+    }
+
+    if (localImage!.questionFile === undefined && localImage?.answerFile === undefined) {
+      localImages.delete(cardId);
+    } else {
+      localImages.set(cardId, localImage!);
+    }
+  }
+}
+
+async function saveChanges() {
+  const _category = category.value;
+  const _name = name.value;
+  const _isPublic = isPublic.value;
+  const _flashcards = flashcards.value;
+  const _setId = uuidv4();
+
+  for (const card of flashcards.value) {
+    const urlPair = imgUrls.value.find(img => img.cardId === card.id);
+
+    if (urlPair) {
+      card.hasQuestionImage = urlPair.questionURL.length > 0;
+      card.hasAnswerImage = urlPair.answerURL.length > 0;
     }
   }
 
-  if (!alreadyExists) {
-    imagesToUpload.push({
-    flashcardId,
-    file,
-    isQuestionImage,
-    });
-  }
+  await server.createFlashcardSet(_name, _category, _isPublic, _flashcards, _setId);
+  await uploadImages(_setId); //TODO dette kan ta litt tid, hva med en loading spinner?
+  
+  router.push('/profile');
 }
 
-async function uploadImages() {
-  for (const image of imagesToUpload) {
-    const response = await server.uploadImage(image.file, flashcardSetId, image.flashcardId, image.isQuestionImage);
+onMounted(() => {
+  addRow();
+});
+
+async function uploadImages(setId: string) {
+  for (const [cardId, localImage] of localImages) {
+    console.log(localImage);
+    if (localImage.questionFile) {
+      await server.uploadImage(localImage.questionFile, setId, cardId, true);
+    }
+
+    if (localImage.answerFile) {
+      await server.uploadImage(localImage.answerFile, setId, cardId, false);
+    }
   }
 }
-
 </script>
