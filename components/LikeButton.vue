@@ -10,7 +10,7 @@
   
 <script setup lang="ts">
 import HeartIcon from '@/assets/icons/heart.svg';
-import HeartFilledIcon from '@/assets/icons/heart-2.svg';
+import HeartFilledIcon from '@/assets/icons/heartfilled.svg';
 import server from '~/classes/server';
   
 let isLiked = false;
