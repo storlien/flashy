@@ -25,8 +25,8 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin: 20px 0;
+  gap: 20px;
+  margin: 25px 0;
 }
 
 .image-container {
@@ -59,70 +59,9 @@
   justify-content: center;
 }
 
-.card {
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  aspect-ratio: 5/7;
-}
-
-.text {
-  font-size: 28px;
-  font-weight: 600;
-  padding-top: 80px;
-  line-height: 1.5;
-  height: 100%;
-}
-
-.card-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 0;
-}
-
-#picture {
-  width: 100%;
-}
-
-.reducedSize {
-  height: 110%;
-  padding-top: 0;
-  margin-top: 10px;
-}
-
-.fullSize {
-  height: 100%;
-  padding-top: 125px;
-  padding-bottom: 80px;
-  margin-top: 20px;
-}
-
-.delete-icon {
-  position: absolute;
-  top: 5px;
-  right: -15px;
-  background-color: white;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-}
-
-.flashcard-image {
-  width: 250px;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
 .flashcard {
-  width: 30vmin;
+  // width: 30vmin;
+  width: 100%;
   aspect-ratio: 5 / 7;
 
   border-radius: 10px;
@@ -164,15 +103,9 @@
 
   .text-input {
     flex-grow: 1;
-
-    // height: 100%;
     width: 100%;
-    // aspect-ratio: 1;
-    // border: none;
     resize: none;
     color: black;
-    // text-align: center;
-
   }
 }
 </style>
@@ -199,7 +132,7 @@
       <label for="public"
         class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
         Offentlig
-        <Checkbox id="public" v-model="isPublic" />
+        <Checkbox id="public" :checked="isPublic" @update:checked="isPublic = !isPublic" />
       </label>
 
       <div class="space" :style="{ height: '10vh' }"></div>
@@ -210,24 +143,30 @@
         <div class="flashcard">
           <label class="image-input">
             <input type="file" accept="image/*" @change="(e) => changeImage(card, e, 'question')" hidden>
-            <ImageIcon v-if="!imgURLs[index].questionURL" color="#f0f0f0" class="image-icon w-12 h-12" />
-            <img v-else :src="imgURLs[index].questionURL" />
+            <ImageIcon v-if="!imgUrls[index].questionURL" color="#f0f0f0" class="image-icon w-12 h-12" />
+            <div v-else class="image-container">
+              <img :src="imgUrls[index].questionURL" />
+              <Button variant="ghost" class="absolute left-2 top-2 w-8 h-8 p-0" @click.prevent="removeImage(card.id, 'question')">
+                <XCircle color="#dd1d4a" class="w-8 h-8"></XCircle>
+              </Button>
+            </div>
           </label>
           <Textarea class="text-input" v-model="card.question" :maxlength="100" placeholder="Spørsmål"></Textarea>
         </div>
         <div class="flashcard">
           <label class="image-input">
             <input type="file" accept="image/*" @change="(e) => changeImage(card, e, 'answer')" hidden>
-            <ImageIcon v-if="!imgURLs[index].answerURL" color="#f0f0f0" class="image-icon w-12 h-12" />
-            <img v-else :src="imgURLs[index].answerURL" />
+            <ImageIcon v-if="!imgUrls[index].answerURL" color="#f0f0f0" class="image-icon w-12 h-12" />
+            <img v-else :src="imgUrls[index].answerURL" />
           </label>
           <Textarea class="text-input" v-model="card.answer" :maxlength="100" placeholder="Svar"></Textarea>
         </div>
 
-        <Button @click="removeRow(card.id)" variant="ghost">
-          <XCircle color="#dd1d4a" class="w-10 h-10"></XCircle>
+        <Button @click="removeRow(card.id)" variant="ghost" class="w-8 h-8 p-0">
+          <XCircle color="#dd1d4a" class="w-8 h-8"></XCircle>
         </Button>
       </div>
+      <div class="h-10"></div>
       <div class="button-container">
         <Button type="submit" @click="addRow">Legg til spørsmål</Button>
       </div>
@@ -262,7 +201,7 @@ const route = useRoute();
 const name = ref("");
 const category = ref("");
 const isPublic = ref(false);
-const imgURLs = ref<FlashcardImages[]>([]);
+const imgUrls = ref<FlashcardImages[]>([]);
 const shouldOpen = ref(false);
 const setId = route.params.id;
 const cardSet = ref<FlashcardSet | null>(null);
@@ -285,17 +224,17 @@ function changeImage(card: Flashcard, event: Event, type: 'question' | 'answer')
   const url = URL.createObjectURL(file);
 
   console.log(flashcards.value);
-  console.log(imgURLs.value);
-  const cardIndex = imgURLs.value.findIndex(img => img.cardId === card.id);
+  console.log(imgUrls.value);
+  const cardIndex = imgUrls.value.findIndex(img => img.cardId === card.id);
 
   console.log(cardIndex);
 
   if (cardIndex === -1) return;
 
   if (type === 'question') {
-    imgURLs.value[cardIndex].questionURL = url;
+    imgUrls.value[cardIndex].questionURL = url;
   } else {
-    imgURLs.value[cardIndex].answerURL = url;
+    imgUrls.value[cardIndex].answerURL = url;
   }
 
   if (localImages.has(card.id)) {
@@ -326,7 +265,7 @@ function addRow() {
   const id = uuidv4();
 
   flashcards.value.push({ id: id, question: "", answer: "" });
-  imgURLs.value.push({ cardId: id, questionURL: "", answerURL: "" });
+  imgUrls.value.push({ cardId: id, questionURL: "", answerURL: "" });
 
   console.log(flashcards.value);
 }
@@ -339,7 +278,35 @@ function removeRow(id: string) {
   const index = flashcards.value.indexOf(row);
 
   flashcards.value.splice(index, 1);
-  imgURLs.value.splice(index, 1);
+  imgUrls.value.splice(index, 1);
+}
+
+function removeImage(cardId: string, type: "question" | "answer") {
+  const imgUrl = imgUrls.value.find(img => img.cardId === cardId);
+
+  if (!imgUrl) return;
+
+  if (type === "question") {
+    imgUrl.questionURL = "";
+  } else {
+    imgUrl.answerURL = "";
+  }
+
+  if (localImages.has(cardId)) {
+    const localImage = localImages.get(cardId);
+
+    if (type === "question") {
+      localImage!.questionFile = undefined;
+    } else {
+      localImage!.answerFile = undefined;
+    }
+
+    if (localImage!.questionFile === undefined && localImage?.answerFile === undefined) {
+      localImages.delete(cardId);
+    } else {
+      localImages.set(cardId, localImage!);
+    }
+  }
 }
 
 async function saveChanges() {
@@ -352,8 +319,10 @@ async function saveChanges() {
   set.isPublic = isPublic.value;
   set.flashcards = flashcards.value;
 
+  alert(set.isPublic);
+
   for (const card of flashcards.value) {
-    const urlPair = imgURLs.value.find(img => img.cardId === card.id);
+    const urlPair = imgUrls.value.find(img => img.cardId === card.id);
 
     if (urlPair) {
       card.hasQuestionImage = urlPair.questionURL.length > 0;
@@ -384,10 +353,10 @@ async function getImages() {
   if (!cardSet.value) return;
   const images = await server.getImagesForFlashcardSet(cardSet.value);
 
-  imgURLs.value = [];
+  imgUrls.value = [];
 
   for (const image of images) {
-    imgURLs.value.push({
+    imgUrls.value.push({
       cardId: image.cardId,
       questionURL: image.questionURL ?? "",
       answerURL: image.answerURL ?? "",
@@ -433,13 +402,13 @@ function loadPreview(event: Event, id: string, isQuestion: boolean) {
   }
 
   if (isQuestion) {
-    const card = imgURLs.value.find(urls => urls.cardId === id);
+    const card = imgUrls.value.find(urls => urls.cardId === id);
     if (card) {
       card.questionURL = URL.createObjectURL(file);
     }
 
   } else {
-    const card = imgURLs.value.find(urls => urls.cardId === id);
+    const card = imgUrls.value.find(urls => urls.cardId === id);
     if (card) {
       card.answerURL = URL.createObjectURL(file);
     }

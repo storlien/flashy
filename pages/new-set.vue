@@ -104,6 +104,7 @@
 
         <Button @click="removeRow(index)" variant="outline">X</Button>
       </div>
+      <div class="h-10"></div>
       <div class="button-container">
         <Button type="submit" @click="addRow">Legg til spørsmål</Button>
       </div>

@@ -122,6 +122,35 @@ async function getImages() {
   console.log(images.value);
 }
 
+const imageUrls = computed(() => {
+  const urls = new Map<string, FlashcardImages>();
+  // const urls: FlashcardImages[] = [];
+
+  if (!cards.value || images.value.length === 0) return urls;
+
+  for (const card of cards.value) {
+    const pair = images.value.find((image) => image.cardId === card.id);
+
+    if (pair) {
+      urls.set(card.id, pair);
+    }
+  }
+
+  return urls;
+
+  // for (const card of cards.value) {
+  //   const pair = images.value.find((image) => image.cardId === card.id);
+
+  //   if (pair) {
+  //     urls.push(pair);
+  //   }
+  // }
+  
+  // console.log(imageUrls);
+
+  // return urls;
+})
+
 // const urls = computed(() => {
 //   const urls: { q: string; a: string }[] = [];
 
@@ -193,7 +222,7 @@ onMounted(async () => {
     <h1>{{ cardSet.name }}</h1>
     <ProgressBar id="progress" v-model="progress"></ProgressBar>
   </div>
-  <div v-if="cards && images" class="set-page">
+  <div v-if="cards && imageUrls" class="set-page">
     <div
       v-if="stack.length"
       class="stack"
@@ -213,7 +242,7 @@ onMounted(async () => {
         <div class="flashcard" :class="{ answer: revealed === card.id }">
           <img
             v-if="card.hasAnswerImage"
-            :src="images[reverseIterator(i)]?.answerURL ?? ''"
+            :src="imageUrls.get(card.id)?.answerURL ?? ''"
             :alt="card.answer"
           />
           <h1>{{ card.answer }}</h1>
@@ -227,7 +256,7 @@ onMounted(async () => {
           </AngryIcon>
           <img
             v-if="card.hasQuestionImage"
-            :src="images[reverseIterator(i)]?.questionURL ?? ''"
+            :src="imageUrls.get(card.id)?.questionURL ?? ''"
             :alt="card.question"
           />
           <h1>{{ card.question }}</h1>
