@@ -1,21 +1,20 @@
 <template>
-  <NavBar></NavBar>
-  <div id="discover">
-    <div></div>
-    <div class="center-column">
-      <div id="discover-header">
-        <h1>Utforsk</h1>
-      </div>
-      <DiscoverSearch id="tagsearch" @update="updateFilter"></DiscoverSearch>
-      <div id="table-container">
-        <div id="flashcards-header">
-          <h1>Flashcard sett</h1>
+    <NavBar></NavBar>
+    <div id="discover">
+        <div></div>
+        <div class="center-column">
+            <div id="discover-header">
+                <h1>Utforsk</h1>
+            </div>
+            <DiscoverSearch id="tagsearch" @update="updateFilter"></DiscoverSearch>
+            <div id="table-container">
+                <div id="flashcards-header">
+                    <h1>Flashcard sett</h1>
+                </div>
+                <DataTable id="table" :columns="discoverycolumns" :data="filteredSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
+            </div>
         </div>
-        <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick"
-          :empty-text="emptyText" />
-    </div> 
     </div>
-  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -100,7 +99,7 @@
 
 <script setup lang="ts">
 import DiscoverSearch from '@/components/flashy/DiscoverSearch.vue';
-import { columns } from '~/classes/discovery-columns';
+import { discoverycolumns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
 

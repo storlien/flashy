@@ -7,17 +7,31 @@
 
       <div id="table-container">
         <div id="my-flashcards-header">
-          <h1>Mine flashcards</h1>
-          <Button type="submit" @click="$router.push('/new-set')">
-            Nytt sett
-          </Button>
+          <h1>Mine offentlige favorittsett</h1>
         </div>
-        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
+        <DataTable id="table" :columns="discoverycolumns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
+   
+  
+
+
+  <div id="table-container2">
+    <div id="my-flashcards-header">
+      <h1>Mine egne flashcardsett</h1>
+      <Button type="submit" @click="$router.push('/new-set')">
+        Nytt sett
+      </Button>
     </div>
+    <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
   </div>
+
+  <div class="space" :style="{ height: '10vh' }"></div>
+</div>
+</div>
+   
+    
 </template>
 
 <style lang="scss">
@@ -66,11 +80,25 @@
     width: 100%;
   }
 }
+
+#table-container2 {
+  display: flex;
+  flex-direction: column;
+
+  // align-items: flex-end;
+  justify-content: stretch;
+  row-gap: 10px;
+
+  #table {
+    width: 100%;
+  }
+}
 </style>
 
 <script setup lang="ts">
 import type { FlashcardSet, UserSettings } from '~/classes/models';
 import { columns } from '~/classes/columns';
+import { discoverycolumns } from '~/classes/discovery-columns';
 import server from '~/classes/server';
 import ManageProfile from '@/components/flashy/ManageProfile.vue';
 import { ref, watch } from 'vue'
