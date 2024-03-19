@@ -2,7 +2,7 @@
     <NavBar></NavBar>
     <div id="discover">
         <div></div>
-        <div class="center-column">
+        <div id="center-column">
             <div id="discover-header">
                 <h1>Utforsk</h1>
             </div>
@@ -18,12 +18,14 @@
 </template>
 
 <style>
-.center-column {
+#center-column {
     display: flex;
     flex-direction: column;
     justify-content: start;
     align-items: center;
     row-gap: 20px;
+    border: 2px solid #f0f0f0;
+    padding: 20px 50px;
 }
 
 #discover {

@@ -11,6 +11,9 @@
       <RouterLink to="/discover" :class="{ 'selected': $route.path === '/discover' }" class="centered-text">
         Utforsk
       </RouterLink>
+      <RouterLink v-if="server.isAdmin()" to="/admin" :class="{ 'selected': $route.path === '/admin' }" class="centered-text">
+        Admin
+      </RouterLink>
     </div>
     <ManageProfile></ManageProfile>
   </nav>
@@ -44,6 +47,7 @@ nav {
 </style>
 
 <script setup lang="ts">
+import server from '~/classes/server';
 import ManageProfile from './flashy/ManageProfile.vue';
 
 </script>

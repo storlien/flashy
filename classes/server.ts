@@ -9,6 +9,7 @@ import { uploadBytesResumable } from 'firebase/storage';
 
 import type { Flashcard, FlashcardImage, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings } from '~/classes/models';
 import { updateEmail, updatePassword, type User } from 'firebase/auth';
+import {ref as vueref } from 'vue';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -22,11 +23,21 @@ const storage = getStorage(app);
 
 class Server {
     public readonly auth: Authenticator;
-    public readonly userSettingsCache = reactive<UserSettings>({ name: '', email: '', favoriteSets: [] });
+    public readonly userSettingsCache = vueref<UserSettings | undefined>();
 
     constructor(app: FirebaseApp) {
         this.auth = new Authenticator(app);
     }
+
+    public async logout() {
+        this.auth.logout();
+        this.userSettingsCache.value = undefined;
+    }
+
+    public isAdmin(): boolean {
+        if (!this.userSettingsCache.value) return false;
+        return this.userSettingsCache.value.role === 'admin';
+      }
 
     //TODO: Can refactor this to return public flashcard sets, but filter out sets that are not yours
     public async getUserFlashcardSets(): Promise<FlashcardSet[]> {
@@ -288,9 +299,7 @@ class Server {
         if (docSnap.exists()) {
             const settings = docSnap.data() as UserSettings;
 
-            this.userSettingsCache.name = settings.name;
-            this.userSettingsCache.email = settings.email;
-            this.userSettingsCache.favoriteSets = settings.favoriteSets;
+            this.userSettingsCache.value = settings;
 
             return settings;
         }
@@ -308,8 +317,10 @@ class Server {
         const docRef = doc(collectionRef, userId);
         const docSnap = await getDoc(docRef);
 
+        
         if (docSnap.exists()) {
             await updateDoc(docRef, settings);
+            this.userSettingsCache.value = settings;
             console.log('Successfully updated user settings');
         }
     }
@@ -365,12 +376,11 @@ class Server {
                 name: null,
                 email: user!.email,
                 favoriteSets: [],
+                role: null,
             };
             await setDoc(docRef, settings);
 
-            this.userSettingsCache.name = settings.name;
-            this.userSettingsCache.email = settings.email;
-            this.userSettingsCache.favoriteSets = settings.favoriteSets;
+            this.userSettingsCache.value = settings;
 
             return settings;
         }
