@@ -1,5 +1,5 @@
 <style lang="scss" scoped>
-#new-set-page {
+#page {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
 
@@ -27,20 +27,6 @@
   justify-content: space-between;
   gap: 20px;
   margin: 25px 0;
-}
-
-.image-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.input-container {
-  width: 250px;
-  margin-top: 18px;
-  display: flex;
-  justify-content: center;
 }
 
 #avbrytKnapp {
@@ -94,6 +80,13 @@
     overflow: hidden;
   }
 
+  .image-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   img {
     width: 100%;
     height: 100%;
@@ -111,7 +104,8 @@
 </style>
 
 <template>
-  <div id="new-set-page">
+  <NavBar></NavBar>
+  <div id="page">
     <div></div>
     <div id="center-column">
       <div id="header-buttons">
@@ -146,7 +140,8 @@
             <ImageIcon v-if="!imgUrls[index].questionURL" color="#f0f0f0" class="image-icon w-12 h-12" />
             <div v-else class="image-container">
               <img :src="imgUrls[index].questionURL" />
-              <Button variant="ghost" class="absolute left-2 top-2 w-8 h-8 p-0" @click.prevent="removeImage(card.id, 'question')">
+              <Button variant="ghost" class="absolute left-2 top-2 w-8 h-8 p-0"
+                @click.prevent="removeImage(card.id, 'question')">
                 <XCircle color="#dd1d4a" class="w-8 h-8"></XCircle>
               </Button>
             </div>
@@ -157,7 +152,13 @@
           <label class="image-input">
             <input type="file" accept="image/*" @change="(e) => changeImage(card, e, 'answer')" hidden>
             <ImageIcon v-if="!imgUrls[index].answerURL" color="#f0f0f0" class="image-icon w-12 h-12" />
-            <img v-else :src="imgUrls[index].answerURL" />
+            <div v-else class="image-container">
+              <img :src="imgUrls[index].answerURL" />
+              <Button variant="ghost" class="absolute left-2 top-2 w-8 h-8 p-0"
+                @click.prevent="removeImage(card.id, 'answer')">
+                <XCircle color="#dd1d4a" class="w-8 h-8"></XCircle>
+              </Button>
+            </div>
           </label>
           <Textarea class="text-input" v-model="card.answer" :maxlength="100" placeholder="Svar"></Textarea>
         </div>
@@ -258,8 +259,6 @@ function changeImage(card: Flashcard, event: Event, type: 'question' | 'answer')
 }
 
 const flashcards = ref<Flashcard[]>([]);
-
-addRow();
 
 function addRow() {
   const id = uuidv4();
@@ -376,8 +375,6 @@ async function getFlashcardSet(id: string) {
   cardSet.value = set;
 }
 async function uploadImages() {
-  // TODO: Iterate over imgUrls and find all that are not URLs
-
   for (const [cardId, localImage] of localImages) {
     console.log(localImage);
     if (localImage.questionFile) {
@@ -388,30 +385,5 @@ async function uploadImages() {
       await server.uploadImage(localImage.answerFile, cardSet.value!.id, cardId, false);
     }
   }
-}
-
-function loadPreview(event: Event, id: string, isQuestion: boolean) {
-  console.log("loadPreview");
-  const file = (event.target as HTMLInputElement)?.files?.[0];
-
-  if (!file) {
-    console.log("No file");
-    return;
-  }
-
-  if (isQuestion) {
-    const card = imgUrls.value.find(urls => urls.cardId === id);
-    if (card) {
-      card.questionURL = URL.createObjectURL(file);
-    }
-
-  } else {
-    const card = imgUrls.value.find(urls => urls.cardId === id);
-    if (card) {
-      card.answerURL = URL.createObjectURL(file);
-    }
-  }
-
-  console.log(file);
 }
 </script>
