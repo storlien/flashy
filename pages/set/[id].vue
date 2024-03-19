@@ -352,15 +352,6 @@ onMounted(async () => {
   }
 }
 
-#comments {
-  margin-top: 50px;
-  margin-bottom: 50px;
-  border: 1px solid #f0f0f0;
-  border-radius: 5px;
-  padding: 20px;
-
-}
-
 .comments-container {
   width: 100vw;
   display: grid;
@@ -378,5 +369,32 @@ onMounted(async () => {
   grid-column: 2;
   flex-direction: left;
   width: 100%;
+  margin-top: 20px;
+}
+
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: start;
+
+  .comment {
+    width: 100%;
+    border: 2px solid #f0f0f0;
+    // margin: 0 20px;
+    padding: 20px;
+
+    h3 {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 12px;
+    }
+
+
+    border-radius: 10px;
+  }
 }
 </style>

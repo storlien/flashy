@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 #AddCommentButton {
   margin-top: 20px;
@@ -37,33 +37,6 @@
   padding: 20px;
   margin-bottom: 40px;
 }
-
-.comments {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: start;
-
-  .comment {
-    width: 100%;
-    border: 2px solid #f0f0f0;
-    // margin: 0 20px;
-    padding: 20px;
-
-    h3 {
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    p {
-      font-size: 12px;
-    }
-
-
-    border-radius: 10px;
-  }
-}
-
 
 .center-column {
   display: flex;
