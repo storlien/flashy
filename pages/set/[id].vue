@@ -1,36 +1,17 @@
 <script setup lang="ts">
 import { AngryIcon, HelpCircleIcon } from 'lucide-vue-next';
-import type { Flashcard, FlashcardSet } from '~/classes/models';
+import type { Flashcard, FlashcardSet, Comment, Comments } from '~/classes/models';
 import server from '~/classes/server';
 import { Progress as ProgressBar } from '~/components/ui/progress';
 import LikeButton from '~/components/LikeButton.vue';
 
-type Comment = {
-  userId: string,
-  text: string,
-}
-
-const comments = ref<Comment[]>([
-  {
-    userId: '65636etfgdf',
-    text: 'Flashy er kult',
-  },
-  {
-    userId: '564fgf4thr',
-    text: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. A neque, sapiente ipsam odit delectus facere architecto. Explicabo inventore, ipsum in, perspiciatis eaque doloremque officia quo itaque impedit porro magni nulla?',
-  },
-])
+const comments = ref<Comment[]>([])
 
 const comment = ref("")
+
 definePageMeta({
   middleware: 'auth',
 });
-
-function createComment() {
-  comments.value.push({ userId: "silje", text: comment.value })
-  comment.value = ""
-
-}
 
 const route = useRoute();
 const id = route.params.id;
@@ -41,6 +22,36 @@ const cardSet = ref<FlashcardSet | undefined>();
 const hardCards = ref<Set<string>>(new Set());
 
 const index = ref(0);
+
+async function createComment() {
+
+  const newComment: Comment = {
+    userId: server.auth.getUserId()!,
+    text: comment.value
+  }
+
+  console.log('New comment: ', newComment)
+
+  await server.uploadComment(newComment, id as string);
+
+  comments.value.push({
+    userId: await server.getNameOrEmail(newComment.userId),
+    text: newComment.text
+  })
+  
+  comment.value = ""
+
+}
+
+async function getComments() {
+  const commentsFromServer: Comments = await server.getComments(id as string);
+  for (const c of commentsFromServer.comments) {
+    comments.value.push({
+      userId: await server.getNameOrEmail(c.userId),
+      text: c.text
+    });
+  }
+}
 
 // Cards visible in stack
 const stack = computed(() => {
@@ -134,10 +145,10 @@ async function getPrefs() {
   hardCards.value = new Set(prefs.difficult);
 }
 
-
 onMounted(async () => {
   await getPrefs();
   await getFlashcardSet();
+  await getComments();
 
   if (!cards.value) return;
 

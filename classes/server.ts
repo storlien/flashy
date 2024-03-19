@@ -6,7 +6,7 @@ import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteD
 
 import { getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 
-import type { Flashcard, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings } from '~/classes/models';
+import type { Flashcard, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings, Comment, Comments } from '~/classes/models';
 import { updateEmail, updatePassword } from 'firebase/auth';
 
 const config: FirebaseOptions = {
@@ -390,6 +390,50 @@ class Server {
 
         return null;
 
+    }
+
+    /** Uploads new comment */
+    public async uploadComment(comment: Comment, flashcardSetId: string) {
+        const collectionRef = collection(db, 'comments');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        let comments: Comments = await this.getComments(flashcardSetId);
+        comments.comments.push(comment);
+
+        await setDoc(docRef, comments);
+    }
+
+    /** Get all comments */
+    public async getComments(flashcardSetId: string): Promise<Comments> {
+        const collectionRef = collection(db, 'comments');
+        const docRef = doc(collectionRef, flashcardSetId);
+
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data() as Comments;
+        } else {
+            return { comments: [] };
+        }
+    }
+
+    /** If username is set, return it. If not, return email. If not email, then return user ID */
+    public async getNameOrEmail(userId: string): Promise<string> {
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data() as UserSettings;
+
+            if (data.name) {
+                return data.name;
+            } else {
+                return data.email!;
+            }
+        } else {
+            return userId;
+        }
     }
 
     /** Log an error caught in a try-catch. */
