@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { AngryIcon, HelpCircleIcon } from "lucide-vue-next";
-import type { Flashcard, FlashcardImages, FlashcardSet } from "~/classes/models";
+import type { Comments, Flashcard, FlashcardImages, FlashcardSet } from "~/classes/models";
 import server from "~/classes/server";
 import { Progress as ProgressBar } from "~/components/ui/progress";
+import { type Comment } from "~/classes/models";
 
 definePageMeta({
   middleware: "auth",
@@ -18,6 +19,9 @@ const hardCards = ref<Set<string>>(new Set());
 
 const index = ref(0);
 const isLiked = ref(false);
+
+const comment = ref("");
+const comments = ref<Comment[]>([]);
 
 async function createComment() {
 
@@ -143,7 +147,6 @@ async function getPrefs() {
 
   hardCards.value = new Set(prefs.difficult);
 }
-const images = ref<FlashcardImage[]>([]);
 
 const images = ref<FlashcardImages[]>([]);
 
@@ -156,7 +159,6 @@ async function getImages() {
 
 const imageUrls = computed(() => {
   const urls = new Map<string, FlashcardImages>();
-  // const urls: FlashcardImages[] = [];
 
   if (!cards.value || images.value.length === 0) return urls;
 
@@ -169,52 +171,7 @@ const imageUrls = computed(() => {
   }
 
   return urls;
-
-  // for (const card of cards.value) {
-  //   const pair = images.value.find((image) => image.cardId === card.id);
-
-  //   if (pair) {
-  //     urls.push(pair);
-  //   }
-  // }
-  
-  // console.log(imageUrls);
-
-  // return urls;
 })
-
-// const urls = computed(() => {
-//   const urls: { q: string; a: string }[] = [];
-
-//   for (const card of cards.value ?? []) {
-//     const question = images.value.find(
-//       (image) => image.cardId === card.id && image.type === "question"
-//     )?.url;
-
-//     const answer = images.value.find(
-//       (image) => image.cardId === card.id && image.type === "answer"
-//     )?.url;
-    
-//     urls.push({
-//       q: question ?? '',
-//       a: answer ?? '',
-//     });
-//   }
-
-//   console.log(urls);
-
-//   return urls;
-// });
-
-// function getUrl(flashcard: Flashcard, type: "question" | "answer") {
-//   const image = images.value.find(
-//     (image) => image.cardId === flashcard.id && image.type === type
-//   );
-
-//   if (!image) return "";
-
-//   return image.url;
-// }
 
 onMounted(async () => {
   await getPrefs();

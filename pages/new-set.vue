@@ -136,7 +136,7 @@
 
         <div class="flashcard">
           <label class="image-input">
-            <input type="file" accept="image/*" @change="(e) => changeImage(card, e, 'question')" hidden>
+            <input type="file" accept="image/*" @change="(e: Event) => changeImage(card, e, 'question')" hidden>
             <ImageIcon v-if="!imgUrls[index].questionURL" color="#f0f0f0" class="image-icon w-12 h-12" />
             <div v-else class="image-container">
               <img :src="imgUrls[index].questionURL" />
@@ -150,7 +150,7 @@
         </div>
         <div class="flashcard">
           <label class="image-input">
-            <input type="file" accept="image/*" @change="(e) => changeImage(card, e, 'answer')" hidden>
+            <input type="file" accept="image/*" @change="(e: Event) => changeImage(card, e, 'answer')" hidden>
             <ImageIcon v-if="!imgUrls[index].answerURL" color="#f0f0f0" class="image-icon w-12 h-12" />
             <div v-else class="image-container">
               <img :src="imgUrls[index].answerURL" />
