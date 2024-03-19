@@ -6,6 +6,12 @@ type Flashcard = {
     hasAnswerImage?: boolean;
 }
 
+type FlashcardImage = {
+    cardId: string;
+    type: 'question' | 'answer';
+    url: string;
+}
+
 type FlashcardSet = {
     id: string;
     userId: string;
@@ -30,6 +36,7 @@ type FlashcardSetPrefs = {
 }
 
 type UserSettings = {
+    id?: string;
     name: string | null | undefined;
     email: string | null | undefined;
     role?: string | null;
@@ -60,6 +67,7 @@ type Comments = {
 
 export {
     type Flashcard,
+    type FlashcardImage,
     type FlashcardSet,
     type FlashcardSetPrefs,
     type UserSettings,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AngryIcon, HelpCircleIcon } from 'lucide-vue-next';
-import type { Flashcard, FlashcardSet, Comment, Comments } from '~/classes/models';
+import type { Flashcard, FlashcardImage, FlashcardSet, Comment, Comments } from '~/classes/models';
 import server from '~/classes/server';
 import { Progress as ProgressBar } from '~/components/ui/progress';
 import LikeButton from '~/components/LikeButton.vue';
@@ -97,10 +97,13 @@ function reverseIterator(i: number) {
 }
 
 function restart() {
-  // TODO: Shuffle the cards
   hardCards.value.clear();
   discarded.value = undefined;
   index.value = 0;
+
+  if (!cards.value) return;
+
+  shuffleCards(cards.value, hardCards.value);
 }
 
 const discardClass = ref('success');
@@ -145,10 +148,27 @@ async function getPrefs() {
 
   hardCards.value = new Set(prefs.difficult);
 }
+const images = ref<FlashcardImage[]>([]);
+
+async function getImages() {
+  if (!cardSet.value) return;
+  images.value = await server.getImagesForFlashcardSet(cardSet.value);
+
+  console.log(images.value);
+}
+
+function getUrl(flashcard: Flashcard, type: 'question' | 'answer') {
+  const image = images.value.find(image => image.cardId === flashcard.id && image.type === type);
+
+  if (!image) return '';
+
+  return image.url;
+}
 
 onMounted(async () => {
   await getPrefs();
   await getFlashcardSet();
+  await getImages();
   await getComments();
   await checkLiked();
 
@@ -170,7 +190,7 @@ async function checkLiked() {
 
 <template>
   <NavBar></NavBar>
-  <div v-if="cardSet" class="header">
+  <div v-if="cardSet && images" class="header">
     <Dialog>
       <DialogTrigger as-child>
         <HelpCircleIcon color="#c0c0c0" class="w-8 h-8"></HelpCircleIcon>
@@ -194,19 +214,20 @@ async function checkLiked() {
     <h1> {{ cardSet.name }}</h1>
     <ProgressBar id="progress" v-model="progress"></ProgressBar>
   </div>
-  <div v-if="cards" class="set-page">
+  <div v-if="cards && images" class="set-page">
     <div v-if="stack.length" class="stack" @click="reveal(stack[stack.length - 1].id)">
       <div v-for="(card, i) in stack" class="pair" :key="card.id" :style="{
     transform: `translateY(${reverseIterator(i) * 5}%) scale(${1 - reverseIterator(i) * 0.05})`,
     opacity: 1 - reverseIterator(i) * 0.2,
   }">
         <div class="flashcard" :class="{ 'answer': revealed === card.id }">
+          <img v-if="card.hasAnswerImage" :src="getUrl(card, 'answer')" :alt="card.answer">
           <h1>{{ card.answer }}</h1>
         </div>
         <div class="flashcard" :class="{ 'question': revealed === card.id }">
           <AngryIcon v-if="hardCards.has(card.id)" class="absolute left-3 top-3 w-8 h-8" color="#dd1d4a">
-
           </AngryIcon>
+          <img v-if="card.hasQuestionImage" :src="getUrl(card, 'question')" :alt="card.question">
           <h1>{{ card.question }}</h1>
         </div>
       </div>
@@ -272,6 +293,7 @@ async function checkLiked() {
   position: relative;
   margin-top: 8vh;
 
+
   display: flex;
   gap: 40px;
   flex-direction: row;
@@ -310,6 +332,7 @@ async function checkLiked() {
 
 .flashcard {
   border-radius: 10px;
+  overflow: hidden;
 
   background-color: white;
 
@@ -324,16 +347,26 @@ async function checkLiked() {
 
   opacity: 1;
 
+  img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+
+    border-bottom: 2px solid #f0f0f0;
+  }
+
   h1 {
-    position: absolute;
-    left: 50%;
-    top: 50%;
+    // position: absolute;
+    // left: 50%;
+    // top: 50%;
+
+    margin: auto;
 
     font-size: 1.5rem;
 
     text-align: center;
 
-    transform: translate(-50%, -50%);
+    // transform: translate(-50%, -50%);
   }
 }
 

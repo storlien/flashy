@@ -2,12 +2,13 @@ import type { FirebaseApp } from 'firebase/app';
 import { Authenticator } from './authenticator';
 
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { addDoc, collection, getFirestore, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
-import { getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import { uploadBytesResumable } from 'firebase/storage';
 
-import type { Flashcard, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings, Comment, Comments } from '~/classes/models';
-import { updateEmail, updatePassword } from 'firebase/auth';
+import type { Flashcard, FlashcardImage, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings, Comment, Comments } from '~/classes/models';
+import { updateEmail, updatePassword, type User } from 'firebase/auth';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -219,6 +220,60 @@ class Server {
             console.log('Successfully updated favorite sets');
         }
     }
+
+    public async getAdmins(): Promise<UserSettings[]> {
+        const userId = this.auth.getUserId();
+
+        if (!userId) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        let admins: UserSettings[] = [];
+
+        try {
+            const snapshot = await getDocs(collectionRef);
+
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return admins;
+            }
+
+            snapshot.forEach(doc => {
+                const user = doc.data() as UserSettings;
+                user.id = doc.id;
+
+                if (user.role === "admin") {
+                    admins.push(user);
+                }
+            });
+
+            return admins;
+
+        } catch (e) {
+            Server.logError(e);
+            return admins;
+        }
+    }
+
+    public async updateRole(userId: string, role: string | null): Promise<boolean> {
+        if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
+
+        const collectionRef = collection(db, 'users');
+        const docRef = doc(collectionRef, userId);
+        const docSnap = await getDoc(docRef);
+
+        const update = {
+            role
+        };
+
+        if (docSnap.exists()) {
+            await updateDoc(docRef, update);
+            return true;
+        }
+
+        return false;
+    }
+
+
 
     /** Get favorite flashcard sets */
     public async getUserSettings(): Promise<UserSettings | null> {
@@ -518,6 +573,44 @@ class Server {
         const errorMessage = error.message;
 
         console.error(errorCode, errorMessage);
+    }
+
+    public async getImagesForFlashcardSet(set: FlashcardSet): Promise<FlashcardImage[]> {
+        const urls: FlashcardImage[] = [];
+
+        const storage = getStorage(app);
+
+        set.flashcards.forEach(async (flashcard) => {
+            // Add question image
+            if (flashcard.hasQuestionImage) {
+                const path = `images/${set.id}/${flashcard.id}_question`;
+                const imageRef = ref(storage, path);
+
+                const url = await getDownloadURL(imageRef);
+
+                urls.push({
+                    cardId: flashcard.id,
+                    type: 'question',
+                    url,
+                });
+            }
+
+            // Add answer image
+            if (flashcard.hasAnswerImage) {
+                const path = `images/${set.id}/${flashcard.id}_answer`;
+                const imageRef = ref(storage, path);
+
+                const url = await getDownloadURL(imageRef);
+
+                urls.push({
+                    cardId: flashcard.id,
+                    type: 'answer',
+                    url,
+                });
+            }
+        });
+
+        return urls;
     }
 }
 
