@@ -6,10 +6,10 @@ type Flashcard = {
     hasAnswerImage?: boolean;
 }
 
-type FlashcardImage = {
+type FlashcardImages = {
     cardId: string;
-    type: 'question' | 'answer';
-    url: string;
+    questionURL: string;
+    answerURL: string;
 }
 
 type FlashcardSet = {
@@ -67,7 +67,7 @@ type Comments = {
 
 export {
     type Flashcard,
-    type FlashcardImage,
+    type FlashcardImages,
     type FlashcardSet,
     type FlashcardSetPrefs,
     type UserSettings,

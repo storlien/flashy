@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { AngryIcon, HelpCircleIcon } from 'lucide-vue-next';
-import type { Flashcard, FlashcardImage, FlashcardSet, Comment, Comments } from '~/classes/models';
-import server from '~/classes/server';
-import { Progress as ProgressBar } from '~/components/ui/progress';
-import LikeButton from '~/components/LikeButton.vue';
-
-const comments = ref<Comment[]>([])
-
-const comment = ref("")
+import { AngryIcon, HelpCircleIcon } from "lucide-vue-next";
+import type { Comments, Flashcard, FlashcardImages, FlashcardSet } from "~/classes/models";
+import server from "~/classes/server";
+import { Progress as ProgressBar } from "~/components/ui/progress";
+import { type Comment } from "~/classes/models";
+import LikeButton from "~/components/LikeButton.vue";
 
 definePageMeta({
-  middleware: 'auth',
+  middleware: "auth",
 });
 
 const route = useRoute();
@@ -23,6 +20,9 @@ const hardCards = ref<Set<string>>(new Set());
 
 const index = ref(0);
 const isLiked = ref(false);
+
+const comment = ref("");
+const comments = ref<Comment[]>([]);
 
 async function createComment() {
 
@@ -39,7 +39,7 @@ async function createComment() {
     userId: await server.getNameOrEmail(newComment.userId),
     text: newComment.text
   })
-  
+
   comment.value = ""
 
 }
@@ -57,16 +57,16 @@ async function getComments() {
 // Cards visible in stack
 const stack = computed(() => {
   if (!cards.value) return [];
-  return cards.value.slice(index.value, index.value + 3).toReversed()
+  return cards.value.slice(index.value, index.value + 3).toReversed();
 });
 
-const revealed = ref('');
+const revealed = ref("");
 const discarded = ref<Flashcard | undefined>();
 
 function shuffleCards(flashcards: Flashcard[], difficultCards: Set<string>) {
   // Split the flashcards into two groups
-  const difficult = flashcards.filter(card => difficultCards.has(card.id));
-  const regular = flashcards.filter(card => !difficultCards.has(card.id));
+  const difficult = flashcards.filter((card) => difficultCards.has(card.id));
+  const regular = flashcards.filter((card) => !difficultCards.has(card.id));
 
   // Shuffle each group
   const shuffledDifficult = difficult.sort(() => Math.random() - 0.5);
@@ -76,16 +76,16 @@ function shuffleCards(flashcards: Flashcard[], difficultCards: Set<string>) {
   const shuffledFlashcards = [...shuffledDifficult, ...shuffledRegular];
 
   // Update flashcards.value
-  cards.value = shuffledFlashcards;
+  return shuffledFlashcards;
 }
 
 function reveal(card: string) {
   if (revealed.value === card) {
-    discardClass.value = 'success';
+    discardClass.value = "success";
     discarded.value = stack.value[reverseIterator(0)];
     console.log(discarded.value);
 
-    revealed.value = '';
+    revealed.value = "";
     index.value++;
   } else {
     revealed.value = card;
@@ -106,41 +106,36 @@ function restart() {
   shuffleCards(cards.value, hardCards.value);
 }
 
-const discardClass = ref('success');
+const discardClass = ref("success");
 
 function hard() {
   if (!cards.value) return;
 
   const card = cards.value.splice(index.value, 1)[0];
-  discardClass.value = 'fail';
+  discardClass.value = "fail";
   discarded.value = card;
   cards.value.push(card);
-  revealed.value = '';
+  revealed.value = "";
 
   hardCards.value.add(card.id);
 }
 
 const progress = computed(() => {
   if (!cards.value?.length) return 0;
-  return index.value / cards.value.length * 100;
+  return (index.value / cards.value.length) * 100;
 });
 
-async function getFlashcardSet() {
-  if (typeof id !== 'string') return;
+async function getFlashcardSet(): Promise<FlashcardSet | null> {
+  if (typeof id !== "string") return null;
 
-  const set = await server.getFlashcardSet(id);
-
-  if (!set) return;
-
-  cards.value = set.flashcards;
-  cardSet.value = set;
+  return await server.getFlashcardSet(id);
 }
 
 async function getPrefs() {
   const userId = server.auth.getUserId();
 
   if (!userId) return;
-  if (typeof id !== 'string') return;
+  if (typeof id !== "string") return;
 
   const prefs = await server.getUserSetPrefs(userId, id);
 
@@ -148,44 +143,73 @@ async function getPrefs() {
 
   hardCards.value = new Set(prefs.difficult);
 }
-const images = ref<FlashcardImage[]>([]);
 
-async function getImages() {
-  if (!cardSet.value) return;
-  images.value = await server.getImagesForFlashcardSet(cardSet.value);
+const images = ref<FlashcardImages[]>([]);
 
-  console.log(images.value);
+async function getImages(set: FlashcardSet): Promise<FlashcardImages[]> {
+  return await server.getImagesForFlashcardSet(set);
 }
 
-function getUrl(flashcard: Flashcard, type: 'question' | 'answer') {
-  const image = images.value.find(image => image.cardId === flashcard.id && image.type === type);
+const imageUrls = computed(() => {
+  const urls = new Map<string, FlashcardImages>();
 
-  if (!image) return '';
+  if (!cards.value || images.value.length === 0) return urls;
 
-  return image.url;
-}
+  for (const card of cards.value) {
+    const pair = images.value.find((image) => image.cardId === card.id);
+
+    if (pair) {
+      urls.set(card.id, pair);
+    }
+  }
+
+  return urls;
+})
 
 onMounted(async () => {
   await getPrefs();
-  await getFlashcardSet();
-  await getImages();
+  const _set = await getFlashcardSet();
+
+  if (!_set) return;
+
+  const _images = await getImages(_set);
+
   await getComments();
   await checkLiked();
 
-  if (!cards.value) return;
+  const _cards = shuffleCards(_set.flashcards, hardCards.value);
 
-  shuffleCards(cards.value, hardCards.value);
+  _set.flashcards = _cards;
+
+  cardSet.value = _set;
+  cards.value = _cards;
+  images.value = _images;
 });
 
 async function onChangeLike() {
+  if (cardSet.value === undefined) return;
+
   isLiked.value = !isLiked.value;
+
+  const userId = server.auth.getUserId();
+
+  if (!userId) return;
+
+  if (cardSet.value?.likes === undefined) cardSet.value.likes = [];
+
+  if (!isLiked.value) {
+    const index = cardSet.value.likes.findIndex((id) => id === userId);
+    if (index !== -1) cardSet.value.likes.splice(index, 1);
+  } else {
+    cardSet.value.likes.push(userId);
+  }
+
   await server.changeLike(id as string);
 }
 
 async function checkLiked() {
   isLiked.value = await server.isLiked(id as string);
 }
-
 </script>
 
 <template>
@@ -200,34 +224,36 @@ async function checkLiked() {
           <DialogTitle>Velkommen til Flashy!</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Her kan du øve deg på flashcards. Klikk på kortene for å se svaret. Klikk igjen for å gå til neste kort.
-          <br>
-          <br>
-          For å markere et kort som vanskelig, trykk på det sure fjeset. Kortet vil dukke opp igjen på
-          slutten slik at du kan prøve deg på nytt.
+          Her kan du øve deg på flashcards. Klikk på kortene for å se svaret.
+          Klikk igjen for å gå til neste kort.
+          <br />
+          <br />
+          For å markere et kort som vanskelig, trykk på det sure fjeset. Kortet
+          vil dukke opp igjen på slutten slik at du kan prøve deg på nytt.
         </DialogDescription>
         <DialogClose as-child>
           <Button type="submit">Skjønner!</Button>
         </DialogClose>
       </DialogContent>
     </Dialog>
-    <h1> {{ cardSet.name }}</h1>
+    <h1>{{ cardSet.name }}</h1>
     <ProgressBar id="progress" v-model="progress"></ProgressBar>
   </div>
-  <div v-if="cards && images" class="set-page">
+  <div v-else class="header"></div>
+  <div v-if="cards && imageUrls" class="set-page">
     <div v-if="stack.length" class="stack" @click="reveal(stack[stack.length - 1].id)">
       <div v-for="(card, i) in stack" class="pair" :key="card.id" :style="{
-    transform: `translateY(${reverseIterator(i) * 5}%) scale(${1 - reverseIterator(i) * 0.05})`,
-    opacity: 1 - reverseIterator(i) * 0.2,
+    transform: `translateY(${reverseIterator(i) * 5}%) scale(${1 - reverseIterator(i) * 0.05
+      })`,
   }">
-        <div class="flashcard" :class="{ 'answer': revealed === card.id }">
-          <img v-if="card.hasAnswerImage" :src="getUrl(card, 'answer')" :alt="card.answer">
+        <div class="flashcard" :class="{ answer: revealed === card.id }">
+          <img v-if="card.hasAnswerImage" :src="imageUrls.get(card.id)?.answerURL ?? ''" :alt="card.answer" />
           <h1>{{ card.answer }}</h1>
         </div>
-        <div class="flashcard" :class="{ 'question': revealed === card.id }">
+        <div class="flashcard" :class="{ question: revealed === card.id }">
           <AngryIcon v-if="hardCards.has(card.id)" class="absolute left-3 top-3 w-8 h-8" color="#dd1d4a">
           </AngryIcon>
-          <img v-if="card.hasQuestionImage" :src="getUrl(card, 'question')" :alt="card.question">
+          <img v-if="card.hasQuestionImage" :src="imageUrls.get(card.id)?.questionURL ?? ''" :alt="card.question" />
           <h1>{{ card.question }}</h1>
         </div>
       </div>
@@ -242,24 +268,28 @@ async function checkLiked() {
     </div>
     <div v-else class="finished">
       <p>Gratulerer, du er ferdig!</p>
-      <Button @click="restart">
-        Spill igjen
-      </Button>
+      <Button @click="restart"> Spill igjen </Button>
     </div>
   </div>
+  <div v-else class="h-[50-h]"></div>
   <div v-if="stack.length" class="buttons">
     <button @click="hard">
       <AngryIcon color="#dd1d4a" class="w-10 h-10"></AngryIcon>
     </button>
   </div>
 
-  <div>
-  <div class="comments-container">  
+  <div class="comments-container">
     <div class="center-column">
-      
       <div class="comments">
-        <LikeButton :onChange="onChangeLike" :flashcardSetId="id as string" :isLiked="isLiked"></LikeButton> 
-        <h2 class="titleComments">Kommentarer</h2>
+        <div class="flex flex-row justify-between w-full mb-4">
+          <h1 class="text-lg">Kommentarer</h1>
+          <div class="like-row flex flex-row gap-2">
+            <span v-if="cardSet && cardSet.likes !== undefined" class="pt-1">
+              {{ cardSet.likes?.length }}
+            </span>
+            <LikeButton :onChange="onChangeLike" :flashcardSetId="(id as string)" :isLiked="isLiked"></LikeButton>
+          </div>
+        </div>
         <div v-for="comment in comments">
           <div class="comment">
             <h3>{{ comment.userId }}</h3>
@@ -269,14 +299,18 @@ async function checkLiked() {
       </div>
       <div class="newComment">
         <Textarea placeholder="Skriv en kommentar her" v-model="comment"></Textarea>
-        <Button :disabled="!comment" id="AddCommentButton" @click="createComment">Legg til kommentar</Button>
+
+        <Button :disabled="!comment" id="AddCommentButton" @click="createComment" class="mt-4">
+          Legg til kommentar
+        </Button>
+
+        <div class="h-10"></div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .header {
   width: 100vw;
 
@@ -289,34 +323,35 @@ async function checkLiked() {
   grid-template-columns: 2rem 2fr 2fr 2fr 2rem;
 }
 
-.buttons {
-  position: relative;
-  margin-top: 8vh;
-
-
-  display: flex;
-  gap: 40px;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-}
-
 .set-page {
   position: relative;
-  margin: 4vh 0;
   width: 100vw;
+
+  padding: 5vh 0;
+}
+
+.buttons {
+  position: relative;
 
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  width: 100vw;
+
+  padding-top: 2vh;
+  padding-bottom: 5vh;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.stack {
+  margin: auto;
 }
 
 .stack,
 .pair,
 .flashcard {
-  width: 40vmin;
+  width: 20vw;
   aspect-ratio: 5 / 7;
 
   user-select: none;
@@ -384,6 +419,10 @@ async function checkLiked() {
   align-items: center;
   justify-content: center;
   gap: 20px;
+
+  height: 72vh;
+
+  border-bottom: 2px solid #f0f0f0;
 }
 
 .discarded.fail {
@@ -408,6 +447,7 @@ async function checkLiked() {
 }
 
 .comments-container {
+  margin-top: 5vh;
   width: 100vw;
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
@@ -437,7 +477,7 @@ async function checkLiked() {
     width: 100%;
     border: 2px solid #f0f0f0;
     // margin: 0 20px;
-    padding: 20px;
+    padding: 5px 20px;
 
     h3 {
       font-size: 12px;

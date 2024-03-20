@@ -26,7 +26,6 @@
               verktøy for profiladministrasjon, lagring og organisering, interaksjon med flashcards,
               bildeintegrasjon, moderering og oversikt over populære sett, er Flashy det ideelle verktøyet for
               alle læringssituasjoner.
-              **Sikkert lurt å endre litt på denne teksten**
             </span>
           </div>
         </div>
