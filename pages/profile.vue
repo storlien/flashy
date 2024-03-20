@@ -124,41 +124,10 @@ definePageMeta({
 
 const flashcardSets = ref<FlashcardSet[]>([]);
 const userSettings = ref<UserSettings | null>();
-const favoriteflashcardSets = getFavoriteUserFlashcardSets()
+const favoriteflashcardSets = ref<FlashcardSet[]>([])
 const emptyText = ref<string>('Laster...');
 const router = useRouter();
 
-// function getFavoriteUserFlashcardSets() {
-//   const flashcardSets = ref<FlashcardSet[]>([]);
-  
-
-//   flashcardSets.value.
-//   flashcardSet.value.sort((a, b) => {
-//     const isInFavoriteSetsA = userSettings.value?.favoriteSets.includes(a.id) ? -1 : 1;
-//     const isInFavoriteSetsB = userSettings.value?.favoriteSets.includes(b.id) ? -1 : 1;
-
-//     return (isInFavoriteSetsA - isInFavoriteSetsB);
-
-//   });
-//   flashcardSet.value = [...flashcardSet.value];
-  
-
-//   flashcardSets.value = flashcardSet.value;
-  
-// }
-
-function getFavoriteUserFlashcardSets() {
-  // Anta at du har tilgang til 'flashcardSets' og 'userSettings' ref-er.
-
-  // Filtrer flashcardSets-arrayen for å beholde bare favorittflashcardsettene.
-  const favoriteFlashcardSets = flashcardSets.value.filter(set =>
-    userSettings.value?.favoriteSets.includes(set.id)
-  );
-
-  // Opprett en ny ref med favorittflashcardsettene og returner den.
-  const favoriteFlashcardSetsRef = ref(favoriteFlashcardSets);
-  return favoriteFlashcardSetsRef;
-}
 
 function onRowClick(index: string) {
   const row = flashcardSets.value[parseInt(index)];
@@ -169,8 +138,14 @@ function onRowClick(index: string) {
   router.push({ path: `/set/${rowId}` });
 }
 
+
+
 watch(flashcardSets, () => {
   emptyText.value = 'Du har ikke laget noen sett';
+});
+
+watch(favoriteflashcardSets, () => {
+  emptyText.value = 'Du har ingen favorittsett';
 });
 
 onMounted(async () => {
@@ -182,23 +157,53 @@ onMounted(async () => {
   if (!userSettings.value) {
     userSettings.value = await server.createUserSettings();
   }
-
   flashcardSet.value = await server.getUserFlashcardSets();
-
-  flashcardSet.value.sort((a, b) => {
-      const isInFavoriteSetsA = userSettings.value?.favoriteSets.includes(a.id) ? -1 : 1;
-      const isInFavoriteSetsB = userSettings.value?.favoriteSets.includes(b.id) ? -1 : 1;
-
-      return (isInFavoriteSetsA - isInFavoriteSetsB);
-
-  });
-
-  flashcardSet.value = [...flashcardSet.value];
-  
-
   flashcardSets.value = flashcardSet.value;
 
+  
+
+  const favoriteflashcardSet = ref<FlashcardSet[]>([])
+
+  favoriteflashcardSet.value = await server.getPublicFlashcardSets()
+
+  favoriteflashcardSet.value = favoriteflashcardSet.value.filter(set => {
+    userSettings.value?.favoriteSets.includes(set.id);
+  });
+
+  favoriteflashcardSets.value = favoriteflashcardSet.value
+    
+
   // console.log(userSettings.value);
+  
 });
+
+
+// onMounted(async () => {
+
+// const flashcardSet = ref<FlashcardSet[]>([]);
+
+// userSettings.value = await server.getUserSettings();
+
+// if (!userSettings.value) {
+//   userSettings.value = await server.createUserSettings();
+// }
+
+// flashcardSet.value = await server.getUserFlashcardSets();
+
+// flashcardSet.value.sort((a, b) => {
+//     const isInFavoriteSetsA = userSettings.value?.favoriteSets.includes(a.id) ? -1 : 1;
+//     const isInFavoriteSetsB = userSettings.value?.favoriteSets.includes(b.id) ? -1 : 1;
+
+//     return (isInFavoriteSetsA - isInFavoriteSetsB);
+
+// });
+
+// flashcardSet.value = [...flashcardSet.value];
+
+
+// flashcardSets.value = flashcardSet.value;
+
+// // console.log(userSettings.value);
+// });
 
 </script>
