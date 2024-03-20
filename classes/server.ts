@@ -111,6 +111,7 @@ class Server {
                     category: data.category,
                     isPublic: data.isPublic,
                     flashcards: data.flashcards,
+                    likes: data.likes,
                 }
             } else {
                 console.log(`No document with id ${id}`);
