@@ -382,12 +382,17 @@ async function checkLiked() {
 
   opacity: 1;
 
+  padding: 20px;
+
   img {
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
 
     border-bottom: 2px solid #f0f0f0;
+
+    border-radius: 5px;
+    margin-bottom: 10px;
   }
 
   h1 {
