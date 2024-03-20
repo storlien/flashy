@@ -167,9 +167,10 @@ onMounted(async () => {
   favoriteflashcardSet.value = await server.getPublicFlashcardSets()
 
   favoriteflashcardSet.value = favoriteflashcardSet.value.filter(set => {
-    userSettings.value?.favoriteSets.includes(set.id);
+    return userSettings.value?.favoriteSets.includes(set.id);
   });
 
+  favoriteflashcardSet.value = [...favoriteflashcardSet.value];
   favoriteflashcardSets.value = favoriteflashcardSet.value
     
 
