@@ -4,31 +4,31 @@
     <div></div>
     <div id="center-column">
       <div class="space" :style="{ height: '10vh' }"></div>
-
-      <div id="table-container">
-        <div id="my-flashcards-header">
-          <h1>Mine offentlige favorittsett</h1>
-        </div>
-        <DataTable id="table" :columns="discoverycolumns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
-      </div>
-
-      <div class="space" :style="{ height: '10vh' }"></div>
-   
-  
-
-
-  <div id="table-container2">
+      
+      <div id="table-container2">
     <div id="my-flashcards-header">
       <h1>Mine egne flashcardsett</h1>
       <Button type="submit" @click="$router.push('/new-set')">
         Nytt sett
       </Button>
     </div>
-    <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
+    <DataTable id="table2" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
   </div>
 
   <div class="space" :style="{ height: '10vh' }"></div>
-</div>
+
+
+      <div id="table-container">
+        <div id="my-flashcards-header">
+          <h1>Favorittsett</h1>
+        </div>
+        <DataTable id="table" :columns="discoverycolumns" :data="favoriteflashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
+      </div>
+
+      <div class="space" :style="{ height: '10vh' }"></div>
+   
+
+    </div>
 </div>
    
     
@@ -89,8 +89,9 @@
   justify-content: stretch;
   row-gap: 10px;
 
-  #table {
+  #table2 {
     width: 100%;
+    
   }
 }
 </style>
@@ -123,9 +124,41 @@ definePageMeta({
 
 const flashcardSets = ref<FlashcardSet[]>([]);
 const userSettings = ref<UserSettings | null>();
+const favoriteflashcardSets = getFavoriteUserFlashcardSets()
 const emptyText = ref<string>('Laster...');
 const router = useRouter();
 
+// function getFavoriteUserFlashcardSets() {
+//   const flashcardSets = ref<FlashcardSet[]>([]);
+  
+
+//   flashcardSets.value.
+//   flashcardSet.value.sort((a, b) => {
+//     const isInFavoriteSetsA = userSettings.value?.favoriteSets.includes(a.id) ? -1 : 1;
+//     const isInFavoriteSetsB = userSettings.value?.favoriteSets.includes(b.id) ? -1 : 1;
+
+//     return (isInFavoriteSetsA - isInFavoriteSetsB);
+
+//   });
+//   flashcardSet.value = [...flashcardSet.value];
+  
+
+//   flashcardSets.value = flashcardSet.value;
+  
+// }
+
+function getFavoriteUserFlashcardSets() {
+  // Anta at du har tilgang til 'flashcardSets' og 'userSettings' ref-er.
+
+  // Filtrer flashcardSets-arrayen for å beholde bare favorittflashcardsettene.
+  const favoriteFlashcardSets = flashcardSets.value.filter(set =>
+    userSettings.value?.favoriteSets.includes(set.id)
+  );
+
+  // Opprett en ny ref med favorittflashcardsettene og returner den.
+  const favoriteFlashcardSetsRef = ref(favoriteFlashcardSets);
+  return favoriteFlashcardSetsRef;
+}
 
 function onRowClick(index: string) {
   const row = flashcardSets.value[parseInt(index)];
