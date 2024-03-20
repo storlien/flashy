@@ -12,7 +12,7 @@
         Nytt sett
       </Button>
     </div>
-    <DataTable id="table2" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
+    <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
   </div>
 
   <div class="space" :style="{ height: '10vh' }"></div>
@@ -22,7 +22,7 @@
         <div id="my-flashcards-header">
           <h1>Favorittsett</h1>
         </div>
-        <DataTable id="table" :columns="discoverycolumns" :data="favoriteflashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
+        <DataTable id="table_favorite" :columns="discoverycolumns" :data="favoriteflashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
@@ -78,6 +78,7 @@
 
   #table {
     width: 100%;
+ 
   }
 }
 
@@ -89,7 +90,7 @@
   justify-content: stretch;
   row-gap: 10px;
 
-  #table2 {
+  #table_favorite {
     width: 100%;
     
   }
