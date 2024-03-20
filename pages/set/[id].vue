@@ -103,7 +103,10 @@ function restart() {
 
   if (!cards.value) return;
 
-  shuffleCards(cards.value, hardCards.value);
+  const _cards = shuffleCards(cards.value, hardCards.value);
+
+  cardSet.value!.flashcards = _cards;
+  cards.value = _cards;
 }
 
 const discardClass = ref("success");
@@ -259,9 +262,11 @@ async function checkLiked() {
       </div>
       <div v-if="discarded" :key="discarded.id">
         <div class="flashcard answer discarded" :class="discardClass">
+          <img v-if="discarded.hasAnswerImage" :src="imageUrls.get(discarded.id)?.answerURL ?? ''" :alt="discarded.answer" />
           <h1>{{ discarded.answer }}</h1>
         </div>
         <div class="flashcard question discarded" :class="discardClass">
+          <img v-if="discarded.hasQuestionImage" :src="imageUrls.get(discarded.id)?.questionURL ?? ''" :alt="discarded.question" />
           <h1>{{ discarded.question }}</h1>
         </div>
       </div>
@@ -298,7 +303,7 @@ async function checkLiked() {
         </div>
       </div>
       <div class="newComment">
-        <Textarea placeholder="Skriv en kommentar her" v-model="comment"></Textarea>
+        <Textarea placeholder="Skriv en kommentar" v-model="comment"></Textarea>
 
         <Button :disabled="!comment" id="AddCommentButton" @click="createComment" class="mt-4">
           Legg til kommentar
@@ -396,17 +401,9 @@ async function checkLiked() {
   }
 
   h1 {
-    // position: absolute;
-    // left: 50%;
-    // top: 50%;
-
     margin: auto;
-
     font-size: 1.5rem;
-
     text-align: center;
-
-    // transform: translate(-50%, -50%);
   }
 }
 
