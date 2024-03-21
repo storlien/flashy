@@ -30,7 +30,7 @@ class Server {
     }
 
     public async logout() {
-        this.auth.logout();
+        await this.auth.logout();
         this.userSettingsCache.value = undefined;
     }
 

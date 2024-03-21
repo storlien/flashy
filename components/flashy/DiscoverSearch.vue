@@ -3,7 +3,11 @@
     <div class="flex gap-2 flex-wrap items-center px-3">
       <TagsInputItem v-for="item in search" :key="item" :value="item">
         <TagsInputItemText />
-        <TagsInputItemDelete />
+        <TagsInputItemDelete @click.prevent="() => {
+          search.splice(search.indexOf(item), 1);
+
+          emit('update', search);
+        }" />
       </TagsInputItem>
     </div>
 
@@ -42,7 +46,6 @@ const open = ref(false);
 const searchTerm = ref('');
 
 function select(ev: any) {
-  
   if (typeof ev.detail.value === 'string') {
     searchTerm.value = ''
     search.value.push(ev.detail.value)

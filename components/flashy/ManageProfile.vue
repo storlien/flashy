@@ -145,8 +145,8 @@ function updateFromCache() {
 }
 
 async function logout() {
-  router.push({ path: '/login' });
   await server.logout();
+  router.push('/login');
 }
 </script>
 
