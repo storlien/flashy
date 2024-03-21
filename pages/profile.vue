@@ -24,7 +24,7 @@
           <h1>Favorittsett</h1>
         </div>
         <DataTable id="table_favorite" :columns="discoverycolumns" :data="favoriteflashcardSets"
-          :on-row-click="onRowClick" :empty-text="emptyText" />
+          :on-row-click="onRowClickFavorite" :empty-text="emptyText" />
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
@@ -133,6 +133,15 @@ const router = useRouter();
 
 function onRowClick(index: string) {
   const row = flashcardSets.value[parseInt(index)];
+  const rowId = row.id;
+
+  // console.log(row.id);
+
+  router.push({ path: `/set/${rowId}` });
+}
+
+function onRowClickFavorite(index: string) {
+  const row = favoriteflashcardSets.value[parseInt(index)];
   const rowId = row.id;
 
   // console.log(row.id);
