@@ -240,7 +240,7 @@ async function checkLiked() {
           <h1>{{ card.answer }}</h1>
         </div>
         <div class="flashcard" :class="{ question: revealed === card.id }">
-          <AngryIcon v-if="hardCards.has(card.id)" class="absolute left-3 top-3 w-8 h-8" color="#dd1d4a">
+          <AngryIcon v-if="hardCards.has(card.id)" class="absolute left-1 top-1 w-8 h-8" color="#dd1d4a">
           </AngryIcon>
           <img v-if="card.hasQuestionImage" :src="imageUrls.get(card.id)?.questionURL ?? ''" :alt="card.question" />
           <h1>{{ card.question }}</h1>
