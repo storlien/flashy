@@ -159,7 +159,13 @@ const imageUrls = computed(() => {
 onMounted(async () => {
   const _set = await getFlashcardSet();
 
-  if (!_set) return;
+  console.log(_set);
+
+  if (!_set) {
+    console.error("Flashcard set not found");
+    useRouter().push("/404");
+    return;
+  }
 
   const _images = await getImages(_set);
 
