@@ -24,15 +24,15 @@ const discoverycolumns: ColumnDef<FlashcardSet>[] = [
             return h('div', { class: 'text-right font-medium' }, name);
         },
     },
-    {
-        accessorKey: 'creator',
-        header: () => h('div', { class: 'text-right' }, 'Skaper'),
-        cell: ({ row }) => {
-            const creator = row.getValue('creator') as unknown as string;
+    // {
+    //     accessorKey: 'creator',
+    //     header: () => h('div', { class: 'text-right' }, 'Skaper'),
+    //     cell: ({ row }) => {
+    //         const creator = row.getValue('creator') as unknown as string;
 
-            return h('div', { class: 'text-right font-medium' }, creator);
-        },
-    },
+    //         return h('div', { class: 'text-right font-medium' }, creator);
+    //     },
+    // },
     {
         accessorKey: 'category',
         header: () => h('div', { class: 'text-right' }, 'Kategori'),
