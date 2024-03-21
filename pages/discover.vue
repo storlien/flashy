@@ -76,11 +76,16 @@
 #table-container {
   display: flex;
   flex-direction: column;
-
   width: 100%;
+  
 
   justify-content: stretch;
   row-gap: 10px;
+
+  #table {
+    width: 100%;
+ 
+  }
 }
 
 #flashcards-header {
