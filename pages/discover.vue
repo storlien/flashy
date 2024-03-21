@@ -17,32 +17,15 @@
     </div>
 </template>
 
-<style lang="scss" scoped>
-
-#AddCommentButton {
-  margin-top: 20px;
-}
-
-.kommentarboks{
-  margin-top: 20px;
-}
-
-.titleComments{
-  margin-bottom: 20px;
-  margin-top: 20px;
-}
-
-.comments-container{
-  padding: 20px;
-  margin-bottom: 40px;
-}
-
-.center-column {
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  align-items: center;
-  row-gap: 20px;
+<style>
+#center-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    row-gap: 20px;
+    border: 2px solid #f0f0f0;
+    padding: 20px 50px;
 }
 
 #discover {

@@ -1,5 +1,5 @@
 <template>
-  <NavBar/>
+  <NavBar />
   <div id="profile">
     <div></div>
     <div id="center-column">
@@ -35,7 +35,6 @@
 </template>
 
 <style lang="scss">
-
 #center-column {
   border: 2px solid #f0f0f0;
   padding: 20px 50px;
@@ -152,7 +151,7 @@ watch(favoriteflashcardSets, () => {
 onMounted(async () => {
 
   const flashcardSet = ref<FlashcardSet[]>([]);
-  
+
   userSettings.value = await server.getUserSettings();
 
   if (!userSettings.value) {

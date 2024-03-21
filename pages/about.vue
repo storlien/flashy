@@ -56,6 +56,8 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+  border: 2px solid #f0f0f0;
+  padding: 20px 50px;
 }
 
 .container {

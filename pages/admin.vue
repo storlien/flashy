@@ -115,7 +115,7 @@ defineComponent({
 
 
 definePageMeta({
-  middleware: 'auth',
+  middleware: ['auth', 'admin'],
 });
 
 const router = useRouter();
