@@ -23,7 +23,7 @@
       </DialogHeader>
 
       <form @submit="onSubmit" class="grid gap-4 py-4">
-        <div class="relative flex justify-center">
+        <!-- <div class="relative flex justify-center">
           <Label for="picture">
             <Avatar class="h-[160px] w-[160px] cursor-pointer">
               <AvatarImage src="" alt="User avatar" class="w-full h-full" />
@@ -38,7 +38,7 @@
             </div>
           </Label>
           <Input id="picture" type="file" style="display: none" />
-        </div>
+        </div> -->
 
         <FormField v-slot="{ componentField }" name="username">
           <FormItem>
