@@ -115,6 +115,8 @@ const form = useForm({
   validationSchema: formSchema,
 });
 
+const router = useRouter();
+
 const onSubmit = form.handleSubmit(async (formData) => {
   console.log(formData);
 
@@ -130,7 +132,7 @@ const onSubmit = form.handleSubmit(async (formData) => {
     await server.updateUserPassword(formData.password);
   }
 
-  useRouter().go(0);
+  await router.go(0);
 });
 
 watch(server.userSettingsCache, () => {
@@ -141,8 +143,6 @@ function updateFromCache() {
   form.setFieldValue('username', server.userSettingsCache.value?.name ?? '', true);
   form.setFieldValue('email', server.userSettingsCache.value?.email ?? '', true);
 }
-
-const router = useRouter();
 
 async function logout() {
   router.push({ path: '/login' });
