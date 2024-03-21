@@ -5,16 +5,16 @@ import type { Flashcard, FlashcardSet } from './models';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 
 const columns: ColumnDef<FlashcardSet>[] = [
-    {
-        id: 'favorite',
-        cell: ({ row }) => {
-            // const isFavorite = server.userSettingsCache?.favoriteSets.includes(row.original.id);
+    // {
+    //     id: 'favorite',
+    //     cell: ({ row }) => {
+    //         // const isFavorite = server.userSettingsCache?.favoriteSets.includes(row.original.id);
 
-            return h('div', { class: 'relative' }, h(FavoriteButton, {
-                setId: row.original.id,
-            }))
-        },
-    },
+    //         return h('div', { class: 'relative' }, h(FavoriteButton, {
+    //             setId: row.original.id,
+    //         }))
+    //     },
+    // },
     {
         accessorKey: 'name',
         header: () => h('div', { class: 'text-right' }, 'Navn'),

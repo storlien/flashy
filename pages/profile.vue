@@ -5,9 +5,9 @@
     <div id="center-column">
       <div class="space" :style="{ height: '10vh' }"></div>
 
-      <div id="table-container">
+      <div id="table-container2">
         <div id="my-flashcards-header">
-          <h1>Mine flashcards</h1>
+          <h1>Mine egne flashcardsett</h1>
           <Button type="submit" @click="$router.push('/new-set')">
             Nytt sett
           </Button>
@@ -17,8 +17,23 @@
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
+
+
+      <div id="table-container">
+        <div id="my-flashcards-header">
+          <h1>Favorittsett</h1>
+        </div>
+        <DataTable id="table_favorite" :columns="discoverycolumns" :data="favoriteflashcardSets"
+          :on-row-click="onRowClick" :empty-text="emptyText" />
+      </div>
+
+      <div class="space" :style="{ height: '10vh' }"></div>
+
+
     </div>
   </div>
+
+
 </template>
 
 <style lang="scss">
@@ -64,6 +79,21 @@
 
   #table {
     width: 100%;
+
+  }
+}
+
+#table-container2 {
+  display: flex;
+  flex-direction: column;
+
+  // align-items: flex-end;
+  justify-content: stretch;
+  row-gap: 10px;
+
+  #table_favorite {
+    width: 100%;
+
   }
 }
 </style>
@@ -71,6 +101,7 @@
 <script setup lang="ts">
 import type { FlashcardSet, UserSettings } from '~/classes/models';
 import { columns } from '~/classes/columns';
+import { discoverycolumns } from '~/classes/discovery-columns';
 import server from '~/classes/server';
 import ManageProfile from '@/components/flashy/ManageProfile.vue';
 import { ref, watch } from 'vue'
@@ -95,6 +126,7 @@ definePageMeta({
 
 const flashcardSets = ref<FlashcardSet[]>([]);
 const userSettings = ref<UserSettings | null>();
+const favoriteflashcardSets = ref<FlashcardSet[]>([])
 const emptyText = ref<string>('Laster...');
 const router = useRouter();
 
@@ -108,8 +140,14 @@ function onRowClick(index: string) {
   router.push({ path: `/set/${rowId}` });
 }
 
+
+
 watch(flashcardSets, () => {
   emptyText.value = 'Du har ikke laget noen sett';
+});
+
+watch(favoriteflashcardSets, () => {
+  emptyText.value = 'Du har ingen favorittsett';
 });
 
 onMounted(async () => {
@@ -121,28 +159,54 @@ onMounted(async () => {
   if (!userSettings.value) {
     userSettings.value = await server.createUserSettings();
   }
-
   flashcardSet.value = await server.getUserFlashcardSets();
-
-  flashcardSet.value.sort((a, b) => {
-
-    const settings = userSettings.value;
-
-    if (!settings) return 1;
-
-    const isInFavoriteSetsA = settings.favoriteSets.includes(a.id) ? -1 : 1;
-    const isInFavoriteSetsB = settings.favoriteSets.includes(b.id) ? -1 : 1;
-
-    return (isInFavoriteSetsA - isInFavoriteSetsB);
-
-  });
-
-  flashcardSet.value = [...flashcardSet.value];
-
-
   flashcardSets.value = flashcardSet.value;
 
+
+
+  const favoriteflashcardSet = ref<FlashcardSet[]>([])
+
+  favoriteflashcardSet.value = await server.getPublicFlashcardSets()
+
+  favoriteflashcardSet.value = favoriteflashcardSet.value.filter(set => {
+    return userSettings.value?.favoriteSets.includes(set.id);
+  });
+
+  favoriteflashcardSet.value = [...favoriteflashcardSet.value];
+  favoriteflashcardSets.value = favoriteflashcardSet.value
+
+
   // console.log(userSettings.value);
+
 });
+
+
+// onMounted(async () => {
+
+// const flashcardSet = ref<FlashcardSet[]>([]);
+
+// userSettings.value = await server.getUserSettings();
+
+// if (!userSettings.value) {
+//   userSettings.value = await server.createUserSettings();
+// }
+
+// flashcardSet.value = await server.getUserFlashcardSets();
+
+// flashcardSet.value.sort((a, b) => {
+//     const isInFavoriteSetsA = userSettings.value?.favoriteSets.includes(a.id) ? -1 : 1;
+//     const isInFavoriteSetsB = userSettings.value?.favoriteSets.includes(b.id) ? -1 : 1;
+
+//     return (isInFavoriteSetsA - isInFavoriteSetsB);
+
+// });
+
+// flashcardSet.value = [...flashcardSet.value];
+
+
+// flashcardSets.value = flashcardSet.value;
+
+// // console.log(userSettings.value);
+// });
 
 </script>

@@ -1,31 +1,32 @@
 <template>
-    <NavBar></NavBar>
-    <div id="discover">
-        <div></div>
-        <div id="center-column">
-            <div id="discover-header">
-                <h1>Utforsk</h1>
-            </div>
-            <DiscoverSearch id="tagsearch" @update="updateFilter"></DiscoverSearch>
-            <div id="table-container">
-                <div id="flashcards-header">
-                    <h1>Flashcard sett</h1>
-                </div>
-                <DataTable id="table" :columns="columns" :data="filteredSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
-            </div>
+  <NavBar></NavBar>
+  <div id="discover">
+    <div></div>
+    <div id="center-column">
+      <div id="discover-header">
+        <h1>Utforsk</h1>
+      </div>
+      <DiscoverSearch id="tagsearch" @update="updateFilter"></DiscoverSearch>
+      <div id="table-container">
+        <div id="flashcards-header">
+          <h1>Flashcard sett</h1>
         </div>
+        <DataTable id="table" :columns="discoverycolumns" :data="filteredSets" :on-row-click="onRowClick"
+          :empty-text="emptyText" />
+      </div>
     </div>
+  </div>
 </template>
 
-<style>
+<style scoped>
 #center-column {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
-    row-gap: 20px;
-    border: 2px solid #f0f0f0;
-    padding: 20px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  row-gap: 20px;
+  border: 2px solid #f0f0f0;
+  padding: 20px 50px;
 }
 
 #discover {
@@ -59,11 +60,16 @@
 #table-container {
   display: flex;
   flex-direction: column;
-
   width: 100%;
+
 
   justify-content: stretch;
   row-gap: 10px;
+
+  #table {
+    width: 100%;
+
+  }
 }
 
 #flashcards-header {
@@ -76,13 +82,11 @@
 #table {
   width: 100vw;
 }
-
-
 </style>
 
 <script setup lang="ts">
 import DiscoverSearch from '@/components/flashy/DiscoverSearch.vue';
-import { columns } from '~/classes/discovery-columns';
+import { discoverycolumns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
 
