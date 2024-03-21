@@ -134,19 +134,6 @@ async function getFlashcardSet(): Promise<FlashcardSet | null> {
   return await server.getFlashcardSet(id);
 }
 
-async function getPrefs() {
-  const userId = server.auth.getUserId();
-
-  if (!userId) return;
-  if (typeof id !== "string") return;
-
-  const prefs = await server.getUserSetPrefs(userId, id);
-
-  if (!prefs) return;
-
-  hardCards.value = new Set(prefs.difficult);
-}
-
 const images = ref<FlashcardImages[]>([]);
 
 async function getImages(set: FlashcardSet): Promise<FlashcardImages[]> {
@@ -170,7 +157,6 @@ const imageUrls = computed(() => {
 })
 
 onMounted(async () => {
-  await getPrefs();
   const _set = await getFlashcardSet();
 
   if (!_set) return;
@@ -278,9 +264,18 @@ async function checkLiked() {
   </div>
   <div v-else class="h-[50-h]"></div>
   <div v-if="stack.length" class="buttons">
-    <button @click="hard">
-      <AngryIcon color="#dd1d4a" class="w-10 h-10"></AngryIcon>
-    </button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <button @click="hard">
+            <AngryIcon color="#dd1d4a" class="w-10 h-10"></AngryIcon>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          Marker som vanskelig
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   </div>
 
   <div class="comments-container">
@@ -392,7 +387,8 @@ async function checkLiked() {
   img {
     width: 100%;
     aspect-ratio: 1;
-    object-fit: cover;
+    // object-fit: cover;
+    object-fit: contain;
 
     border-bottom: 2px solid #f0f0f0;
 
@@ -402,7 +398,7 @@ async function checkLiked() {
 
   h1 {
     margin: auto;
-    font-size: 1.5rem;
+    font-size: 1rem;
     text-align: center;
   }
 }

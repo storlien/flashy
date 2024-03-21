@@ -8,8 +8,8 @@ import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import { uploadBytesResumable } from 'firebase/storage';
 
 import { updateEmail, updatePassword } from 'firebase/auth';
-import type { Comments, Flashcard, FlashcardImages, FlashcardSet, FlashcardSetPrefs, ImageMetadata, UserSettings, Comment } from '~/classes/models';
-import {ref as vueref } from 'vue';
+import { ref as vueref } from 'vue';
+import type { Comment, Comments, Flashcard, FlashcardImages, FlashcardSet, ImageMetadata, UserSettings } from '~/classes/models';
 
 const config: FirebaseOptions = {
     projectId: 'flashy-f8580',
@@ -42,7 +42,7 @@ class Server {
         if (!this.userSettingsCache.value) return false;
 
         return this.userSettingsCache.value.role === 'admin';
-      }
+    }
 
     //TODO: Can refactor this to return public flashcard sets, but filter out sets that are not yours
     public async getUserFlashcardSets(): Promise<FlashcardSet[]> {
@@ -156,24 +156,24 @@ class Server {
     }
 
     /** Get user preferences for a set, if any. */
-    public async getUserSetPrefs(userId: string, setId: string): Promise<FlashcardSetPrefs | null> {
-        const collectionRef = collection(db, 'user-set-prefs');
+    // public async getUserSetPrefs(userId: string, setId: string): Promise<FlashcardSetPrefs | null> {
+    //     const collectionRef = collection(db, 'user-set-prefs');
 
-        const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
+    //     const docRef = await getDoc(doc(collectionRef, `${userId}:${setId}`));
 
-        if (docRef.exists()) {
-            return docRef.data() as FlashcardSetPrefs;
-        } else {
-            return null;
-        }
-    }
+    //     if (docRef.exists()) {
+    //         return docRef.data() as FlashcardSetPrefs;
+    //     } else {
+    //         return null;
+    //     }
+    // }
 
     /** Update user preferences for a set. */
-    public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
-        const collectionRef = collection(db, 'user-set-prefs');
+    // public async updateUserSetPrefs(prefs: FlashcardSetPrefs): Promise<void> {
+    //     const collectionRef = collection(db, 'user-set-prefs');
 
-        await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
-    }
+    //     await setDoc(doc(collectionRef, `${prefs.userId}:${prefs.setId}`), prefs);
+    // }
 
     public async createFlashcardSet(name: string, category: string, isPublic: boolean, flashcards: Flashcard[], id: string): Promise<FlashcardSet | null> {
         if (!this.auth.isLoggedIn()) throw new Error('Unauthorized');
@@ -323,7 +323,7 @@ class Server {
         const docRef = doc(collectionRef, userId);
         const docSnap = await getDoc(docRef);
 
-        
+
         if (docSnap.exists()) {
             await updateDoc(docRef, settings);
             this.userSettingsCache.value = settings;
@@ -602,7 +602,7 @@ class Server {
                 questionURL: '',
                 answerURL: '',
             };
-            
+
             if (flashcard.hasQuestionImage) {
                 const path = `images/${set.id}/${flashcard.id}_question`;
                 const imageRef = ref(storage, path);
