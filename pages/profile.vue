@@ -1,5 +1,5 @@
 <template>
-  <NavBar/>
+  <NavBar />
   <div id="profile">
     <div></div>
     <div id="center-column">
@@ -12,7 +12,8 @@
             Nytt sett
           </Button>
         </div>
-        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
+        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick"
+          :empty-text="emptyText" />
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
@@ -21,7 +22,6 @@
 </template>
 
 <style lang="scss">
-
 #center-column {
   border: 2px solid #f0f0f0;
   padding: 20px 50px;
@@ -115,7 +115,7 @@ watch(flashcardSets, () => {
 onMounted(async () => {
 
   const flashcardSet = ref<FlashcardSet[]>([]);
-  
+
   userSettings.value = await server.getUserSettings();
 
   if (!userSettings.value) {
@@ -125,15 +125,20 @@ onMounted(async () => {
   flashcardSet.value = await server.getUserFlashcardSets();
 
   flashcardSet.value.sort((a, b) => {
-      const isInFavoriteSetsA = userSettings.value?.favoriteSets.includes(a.id) ? -1 : 1;
-      const isInFavoriteSetsB = userSettings.value?.favoriteSets.includes(b.id) ? -1 : 1;
 
-      return (isInFavoriteSetsA - isInFavoriteSetsB);
+    const settings = userSettings.value;
+
+    if (!settings) return 1;
+
+    const isInFavoriteSetsA = settings.favoriteSets.includes(a.id) ? -1 : 1;
+    const isInFavoriteSetsB = settings.favoriteSets.includes(b.id) ? -1 : 1;
+
+    return (isInFavoriteSetsA - isInFavoriteSetsB);
 
   });
 
   flashcardSet.value = [...flashcardSet.value];
-  
+
 
   flashcardSets.value = flashcardSet.value;
 

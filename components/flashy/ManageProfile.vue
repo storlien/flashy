@@ -5,13 +5,13 @@
     <DialogTrigger as-child>
       <div class="flex items-center justify-center">
         <h3 class="mx-3 text-base cursor-pointer">{{
-    server.userSettingsCache.name ?? 'Bruker'
+    server.userSettingsCache.value?.name ?? 'Bruker'
   }}</h3>
         <Avatar class="cursor-pointer h-[45px] w-[45px]">
           <AvatarImage src="" alt="User avatar" />
           <AvatarFallback>
             <span>
-              {{ server.userSettingsCache.name?.charAt(0) ?? 'B' }}
+              {{ server.userSettingsCache.value?.name?.charAt(0) ?? 'B' }}
             </span>
           </AvatarFallback>
         </Avatar>
@@ -29,7 +29,7 @@
               <AvatarImage src="" alt="User avatar" class="w-full h-full" />
               <AvatarFallback class="text-xl">
                 <span>
-                  {{ server.userSettingsCache.name?.charAt(0) ?? 'B' }}
+                  {{ server.userSettingsCache.value?.name?.charAt(0) ?? 'B' }}
                 </span>
               </AvatarFallback>
             </Avatar>
@@ -73,8 +73,8 @@
         <div class="h-2"></div>
 
         <DialogFooter class="w-full flex flex-row justify-between">
-          <Button id="logout-button" variant="outline">
-            <NuxtLink to="/login">Logg ut</NuxtLink>
+          <Button id="logout-button" variant="outline" @click="logout">
+            Logg ut
           </Button>
           <!-- <div class="w-full"></div> -->
           <Button type="submit">Lagre</Button>
@@ -138,8 +138,15 @@ watch(server.userSettingsCache, () => {
 });
 
 function updateFromCache() {
-  form.setFieldValue('username', server.userSettingsCache.name ?? '', true);
-  form.setFieldValue('email', server.userSettingsCache.email ?? '', true);
+  form.setFieldValue('username', server.userSettingsCache.value?.name ?? '', true);
+  form.setFieldValue('email', server.userSettingsCache.value?.email ?? '', true);
+}
+
+const router = useRouter();
+
+async function logout() {
+  router.push({ path: '/login' });
+  await server.logout();
 }
 </script>
 
