@@ -29,31 +29,31 @@
 }
 
 #discover {
-    position: relative;
-    display: grid;
+  position: relative;
+  display: grid;
 
-    height: 100vh;
-    width: 100vw;
-    grid-template-columns: 1fr 2fr 1fr;
+  height: 100vh;
+  width: 100vw;
+  grid-template-columns: 1fr 2fr 1fr;
 }
 
 #discover-header {
-    display: flex;
+  display: flex;
 
-    flex-direction: row;
-    justify-content: center;
-    align-items: start;
+  flex-direction: row;
+  justify-content: center;
+  align-items: start;
 
-    padding: 20px;
+  padding: 20px;
 
-    font-size: 2em;
+  font-size: 2em;
 }
 
 #tagsearch {
-    display: flex;
+  display: flex;
 
-    justify-content: center;
-    align-items: center;
+  justify-content: center;
+  align-items: center;
 }
 
 #table-container {
@@ -67,15 +67,17 @@
 }
 
 #flashcards-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 #table {
-    width: 100%;
+  width: 100vw;
 }
+
+
 </style>
 
 <script setup lang="ts">
@@ -83,6 +85,7 @@ import DiscoverSearch from '@/components/flashy/DiscoverSearch.vue';
 import { columns } from '~/classes/discovery-columns';
 import type { FlashcardSet } from '~/classes/models';
 import server from '~/classes/server';
+
 
 definePageMeta({
   middleware: 'auth',
@@ -120,7 +123,7 @@ const router = useRouter();
 function onRowClick(index: string) {
   const row = filteredSets.value[parseInt(index)];
   const rowId = row.id;
-  router.push({ path: `/set/${rowId}`});
+  router.push({ path: `/set/${rowId}` });
 }
 
 onMounted(async () => {

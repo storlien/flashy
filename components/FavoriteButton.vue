@@ -1,23 +1,13 @@
 <template>
-    <div class="favorite-button cursor-pointer ml-2" @click.stop="toggleFavorite" variant="default">
-        <img :src="HeartFilledIcon" v-if="isFavorite" class="heart-fill h-5 w-5 filled">
-        <img :src="HeartIcon" v-else class="heart-outline h-5 w-5">
+    <div class="favorite-button cursor-pointer ml-2" @click.stop="toggleFavorite">
+        <img :src="StarFilledIcon" v-if="isFavorite" class="star-fill h-5 w-5">
+        <img :src="StarIcon" v-else class="star-outline h-5 w-5">
     </div>
 </template>
 
-<style>
-.heart-outline {
-    filter: invert(98%) sepia(64%) saturate(45%) hue-rotate(257deg) brightness(116%) contrast(92%);
-}
-
-.heart-fill {
-    filter: invert(53%) sepia(80%) saturate(3587%) hue-rotate(316deg) brightness(94%) contrast(93%);
-}
-</style>
-
 <script setup lang="ts">
-import HeartIcon from '@/assets/icons/heart.svg';
-import HeartFilledIcon from '@/assets/icons/heart-2.svg';
+import StarIcon from '@/assets/icons/star.svg';
+import StarFilledIcon from '@/assets/icons/starfilled.svg';
 import server from '~/classes/server';
 
 const props = defineProps({
