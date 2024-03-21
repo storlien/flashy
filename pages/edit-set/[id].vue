@@ -361,7 +361,11 @@ async function getImages() {
 async function getFlashcardSet(id: string) {
   const set = await server.getFlashcardSet(id);
 
-  if (!set) return;
+  if (!set) {
+    console.error("Flashcard set not found");
+    router.push("/404");
+    return;
+  }
 
   console.log(set.id);
 

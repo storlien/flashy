@@ -24,6 +24,8 @@ const isLiked = ref(false);
 const comment = ref("");
 const comments = ref<Comment[]>([]);
 
+const router = useRouter();
+
 async function createComment() {
 
   const newComment: Comment = {
@@ -163,7 +165,7 @@ onMounted(async () => {
 
   if (!_set) {
     console.error("Flashcard set not found");
-    useRouter().push("/404");
+    router.push("/404");
     return;
   }
 
