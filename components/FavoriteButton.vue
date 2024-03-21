@@ -18,11 +18,14 @@ const props = defineProps({
 });
 
 const isFavorite = computed(() => {
-    return server.userSettingsCache.favoriteSets.includes(props.setId);
+    return server.userSettingsCache.value?.favoriteSets.includes(props.setId);
 });
 
 async function toggleFavorite() {
-    const cache = server.userSettingsCache;
+    const cache = server.userSettingsCache.value;
+
+    if (!cache) return;
+
     if (cache.favoriteSets.includes(props.setId)) {
         cache.favoriteSets.splice(cache.favoriteSets.indexOf(props.setId), 1);
         await server.updateFavoriteSets(cache.favoriteSets);

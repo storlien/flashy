@@ -34,8 +34,13 @@ class Server {
         this.userSettingsCache.value = undefined;
     }
 
-    public isAdmin(): boolean {
+    public async isAdmin(): Promise<boolean> {
+        if (!this.userSettingsCache.value) {
+            await this.getUserSettings();
+        }
+
         if (!this.userSettingsCache.value) return false;
+
         return this.userSettingsCache.value.role === 'admin';
       }
 
