@@ -372,6 +372,7 @@ async function getFlashcardSet(id: string) {
   flashcards.value = set!.flashcards;
   name.value = set.name;
   category.value = set.category;
+  isPublic.value = set.isPublic;
 
   cardSet.value = set;
 }
