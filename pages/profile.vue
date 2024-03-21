@@ -4,34 +4,36 @@
     <div></div>
     <div id="center-column">
       <div class="space" :style="{ height: '10vh' }"></div>
-      
-      <div id="table-container2">
-    <div id="my-flashcards-header">
-      <h1>Mine egne flashcardsett</h1>
-      <Button type="submit" @click="$router.push('/new-set')">
-        Nytt sett
-      </Button>
-    </div>
-    <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
-  </div>
 
-  <div class="space" :style="{ height: '10vh' }"></div>
+      <div id="table-container2">
+        <div id="my-flashcards-header">
+          <h1>Mine egne flashcardsett</h1>
+          <Button type="submit" @click="$router.push('/new-set')">
+            Nytt sett
+          </Button>
+        </div>
+        <DataTable id="table" :columns="columns" :data="flashcardSets" :on-row-click="onRowClick"
+          :empty-text="emptyText" />
+      </div>
+
+      <div class="space" :style="{ height: '10vh' }"></div>
 
 
       <div id="table-container">
         <div id="my-flashcards-header">
           <h1>Favorittsett</h1>
         </div>
-        <DataTable id="table_favorite" :columns="discoverycolumns" :data="favoriteflashcardSets" :on-row-click="onRowClick" :empty-text="emptyText"/>  
+        <DataTable id="table_favorite" :columns="discoverycolumns" :data="favoriteflashcardSets"
+          :on-row-click="onRowClick" :empty-text="emptyText" />
       </div>
 
       <div class="space" :style="{ height: '10vh' }"></div>
-   
+
 
     </div>
-</div>
-   
-    
+  </div>
+
+
 </template>
 
 <style lang="scss">
@@ -77,7 +79,7 @@
 
   #table {
     width: 100%;
- 
+
   }
 }
 
@@ -91,7 +93,7 @@
 
   #table_favorite {
     width: 100%;
-    
+
   }
 }
 </style>
@@ -160,7 +162,7 @@ onMounted(async () => {
   flashcardSet.value = await server.getUserFlashcardSets();
   flashcardSets.value = flashcardSet.value;
 
-  
+
 
   const favoriteflashcardSet = ref<FlashcardSet[]>([])
 
@@ -172,10 +174,10 @@ onMounted(async () => {
 
   favoriteflashcardSet.value = [...favoriteflashcardSet.value];
   favoriteflashcardSets.value = favoriteflashcardSet.value
-    
+
 
   // console.log(userSettings.value);
-  
+
 });
 
 
